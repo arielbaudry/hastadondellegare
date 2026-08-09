@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { estadoAlmacenamiento, leerArbol, mutarArbol, puedeGuardar } from "@/lib/store";
+import { driver, estadoAlmacenamiento, leerArbol, mutarArbol, puedeGuardar } from "@/lib/store";
 import { arbolDeEjemplo } from "@/lib/ejemplo";
 import { bloquearSiNoPuedeVer, permisosDe } from "@/lib/permisos";
 import { accesoRestringido, ADMIN_EMAIL, smtpConfigurado } from "@/lib/sesion";
@@ -67,10 +67,11 @@ async function responder(req: Request) {
     }
   }
 
-  // Primer arranque: si está vacío, se siembra la familia de ejemplo para que
-  // el micrositio no abra en blanco. Si el almacenamiento no puede escribir
-  // —Vercel sin Upstash— no se intenta: el sitio abre vacío y avisa por qué.
-  if (arbol.personas.length === 0 && arbol.rev === 0 && puedeGuardar()) {
+  // La familia de ejemplo se siembra **sólo en local**, para poder mirar el
+  // micrositio funcionando sin cargar nada. En producción un árbol vacío tiene
+  // que abrir vacío: ver quince desconocidos inventados en el sitio de tu
+  // familia confunde más de lo que ayuda.
+  if (arbol.personas.length === 0 && arbol.rev === 0 && driver === "fs" && puedeGuardar()) {
     const ejemplo = arbolDeEjemplo();
     arbol = await mutarArbol((a) => {
       a.personas = ejemplo.personas;
