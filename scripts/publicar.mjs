@@ -3,32 +3,25 @@
  * Publica el árbol local en producción, de una.
  *
  *   1. Lee storage/tree.json.
- *   2. Sube a Vercel Blob las fotos que están en storage/uploads/ y reescribe
- *      las URLs. Sin este paso las fotos quedarían rotas: en el árbol figuran
- *      como /api/fotos/<uuid>.jpg, que son archivos del disco de este servidor
- *      y producción no puede alcanzar.
- *   3. Manda todo a /api/importar del sitio publicado.
+ *   2. Sube las fotos de storage/uploads/ al sitio publicado y reescribe las
+ *      URLs. Sin esto quedarían rotas: apuntan a archivos del disco de este
+ *      servidor, que producción no puede alcanzar.
+ *   3. Manda el árbol entero a /api/importar.
  *
- * Uso:
+ * Uso (una sola vez):
  *
- *   SITIO=https://hastadondellegare.vercel.app \
- *   ADMIN_CLAVE=... \
- *   BLOB_READ_WRITE_TOKEN=vercel_blob_rw_... \
- *   node scripts/publicar.mjs
+ *   SITIO=https://hastadondellegare.vercel.app ADMIN_CLAVE=... npm run publicar
  *
- * Los dos tokens se copian del panel de Vercel (Settings → Environment
- * Variables). Es una operación de una sola vez: después la familia carga
- * directo en producción.
+ * `ADMIN_CLAVE` es la que hayas puesto en Vercel. No hace falta ningún token
+ * más: las fotos viajan por la propia API del sitio.
  */
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { put } from "@vercel/blob";
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SITIO = process.env.SITIO?.replace(/\/$/, "");
 const CLAVE = process.env.ADMIN_CLAVE;
-const TOKEN_BLOB = process.env.BLOB_READ_WRITE_TOKEN;
 
 if (!SITIO || !CLAVE) {
   console.error("Faltan SITIO y/o ADMIN_CLAVE. Ver el encabezado de este archivo.");
@@ -44,7 +37,6 @@ const subidas = new Map();
 async function subir(url) {
   if (!url.startsWith("/api/fotos/")) return url; // ya es absoluta: no se toca
   if (subidas.has(url)) return subidas.get(url);
-  if (!TOKEN_BLOB) return null; // sin token, la foto se descarta
 
   const archivo = url.slice("/api/fotos/".length);
   const bytes = await readFile(join(raiz, "storage", "uploads", archivo));
@@ -54,37 +46,32 @@ async function subir(url) {
       ? "image/webp"
       : "image/jpeg";
 
-  const { url: publica } = await put(`fotos/${archivo}`, bytes, {
-    access: "public",
-    contentType: tipo,
-    addRandomSuffix: false,
-    token: TOKEN_BLOB,
+  const form = new FormData();
+  form.append("foto", new Blob([bytes], { type: tipo }), archivo);
+  const res = await fetch(`${SITIO}/api/fotos`, {
+    method: "POST",
+    headers: { "x-clave-admin": CLAVE },
+    body: form,
   });
-  subidas.set(url, publica);
+  const datos = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(`subiendo ${archivo}: ${datos.error ?? res.status}`);
+
+  subidas.set(url, datos.url);
   process.stdout.write(".");
-  return publica;
+  return datos.url;
 }
 
 const conFotos = arbol.personas.filter((p) => p.fotos?.length);
-if (conFotos.length && !TOKEN_BLOB) {
-  console.warn(
-    `\n⚠  ${conFotos.length} personas tienen foto pero no pasaste BLOB_READ_WRITE_TOKEN.\n` +
-      "   Se van a publicar sin fotos. Cortá con Ctrl+C si preferís hacerlo bien.",
-  );
-} else if (conFotos.length) {
-  process.stdout.write(`Subiendo fotos `);
+if (conFotos.length) {
+  process.stdout.write("Subiendo fotos ");
   for (const p of arbol.personas) {
     if (!p.fotos?.length) continue;
     const nuevas = [];
-    for (const f of p.fotos) {
-      const publica = await subir(f);
-      if (publica) nuevas.push(publica);
-    }
+    for (const f of p.fotos) nuevas.push(await subir(f));
     p.fotos = nuevas;
   }
   console.log(` ${subidas.size} subidas.`);
 }
-if (!TOKEN_BLOB) for (const p of arbol.personas) p.fotos = [];
 
 // ------------------------------------------------------------- importar
 const res = await fetch(`${SITIO}/api/importar`, {

@@ -311,34 +311,48 @@ servidor no procesa imágenes y la carga anda con datos móviles.
 
 ## Deploy en Vercel
 
-**Las variables del almacenamiento no se escriben a mano: las inyecta Vercel** al
-conectar cada integración. Sólo hay que conectarlas.
+Hace falta **una sola cosa**: un lugar donde guardar los datos. En Vercel el
+disco es de sólo lectura, así que sin eso el sitio abre vacío y avisa.
 
-1. En Vercel, proyecto → **Storage → Marketplace → Upstash → Redis**: crear una
-   base y **Connect** al proyecto. Quedan puestas `UPSTASH_REDIS_REST_URL` y
-   `UPSTASH_REDIS_REST_TOKEN` (o `KV_REST_API_*`, que el store también acepta).
-   El plan gratuito sobra: el árbol entero es un JSON de unos cientos de kB.
-2. **Storage → Blob**: crear un store y **Connect**. Queda `BLOB_READ_WRITE_TOKEN`,
-   que es donde van a parar las fotos.
-3. **Redeploy.** Las variables sólo aplican a deployments nuevos.
-4. Verificar en **Ajustes → Dónde se guarda** que diga *Redis (Upstash)* y
-   *los datos sobreviven al reinicio*.
+**1. Una base gratis en Upstash** (dos minutos, no requiere tarjeta):
+
+- entrar a [upstash.com](https://upstash.com), crear cuenta,
+  **Create Database** → Redis, la región más cercana;
+- en la pantalla de la base, sección **REST API**, copiar los dos valores:
+  `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`.
+
+> También se puede llegar desde Vercel (**Storage → Marketplace → Upstash**),
+> que hace lo mismo y conecta las variables solo. Si esa pantalla no aparece o
+> confunde, el camino de arriba es equivalente y funciona en cualquier plan.
+
+**2. Pegarlas en Vercel**: proyecto → **Settings → Environment Variables**, tres
+variables:
+
+| Variable | Valor |
+|---|---|
+| `UPSTASH_REDIS_REST_URL` | el que copiaste |
+| `UPSTASH_REDIS_REST_TOKEN` | el que copiaste |
+| `ADMIN_CLAVE` | cualquier cosa larga que inventes |
+
+**3. Redeploy.** Las variables sólo aplican a deployments nuevos.
+
+**4. Verificar** en Ajustes → *Dónde se guarda*: tiene que decir *Redis (Upstash)*
+y *los datos sobreviven al reinicio*.
+
+Las fotos van a la misma base. **Vercel Blob es opcional**: si algún día son
+muchas, se conecta un store y con sólo tener `BLOB_READ_WRITE_TOKEN` las nuevas
+empiezan a ir ahí, sin tocar código ni migrar nada.
 
 ### Pasar el árbol de local a producción
 
 Una sola vez, desde el servidor:
 
 ```bash
-SITIO=https://hastadondellegare.vercel.app \
-ADMIN_CLAVE=<la que pusiste en Vercel> \
-BLOB_READ_WRITE_TOKEN=<copiado de Vercel> \
-npm run publicar
+SITIO=https://hastadondellegare.vercel.app ADMIN_CLAVE=<la que pusiste> npm run publicar
 ```
 
-Sube las fotos a Blob, reescribe las URLs y manda el árbol entero. **Sin el token
-de Blob las fotos se pierden**: en el árbol figuran como `/api/fotos/<uuid>.jpg`,
-archivos del disco del servidor que producción no puede alcanzar. El script
-avisa antes de hacerlo.
+Sube las fotos y manda las personas con sus vínculos. No hace falta ningún token
+más: las fotos viajan por la propia API del sitio.
 
 `ADMIN_CLAVE` hace falta sólo para esto y mientras el acceso por enlace esté
 apagado; una vez encendido, manda el rol de la sesión y esa variable deja de

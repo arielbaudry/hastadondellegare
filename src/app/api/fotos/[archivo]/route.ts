@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { leerFotoLocal } from "@/lib/fotos";
+import { leerFoto } from "@/lib/fotos";
 
-/** GET /api/fotos/:archivo — sólo para el driver local; en Vercel sirve el CDN. */
+/** GET /api/fotos/:archivo — sirve la foto, esté en disco o en Upstash. */
 export async function GET(_req: Request, { params }: { params: Promise<{ archivo: string }> }) {
   const { archivo } = await params;
-  const foto = await leerFotoLocal(archivo);
+  const foto = await leerFoto(archivo);
   if (!foto) return new NextResponse("No encontrada", { status: 404 });
 
   return new NextResponse(new Uint8Array(foto.bytes), {

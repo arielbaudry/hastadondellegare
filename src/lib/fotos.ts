@@ -4,18 +4,38 @@ import { randomUUID } from "node:crypto";
 
 /**
  * Guardado de fotos. Las imágenes ya vienen redimensionadas desde el navegador
- * (ver `redimensionar()` en components/FotoInput.tsx), así que acá no hay
+ * (ver `redimensionar()` en components/FotosInput.tsx), así que acá no hay
  * procesamiento: sólo se persisten.
  *
- *  - local    -> storage/uploads/<uuid>.<ext>, servidas por /api/fotos/<archivo>
- *  - Vercel   -> Vercel Blob, servidas por su CDN (URL absoluta)
+ * Tres destinos, en este orden:
+ *
+ *  1. **Vercel Blob**, si está su token. Es lo ideal para muchas fotos.
+ *  2. **Upstash Redis**, el mismo lugar donde ya vive el árbol. Así alcanza con
+ *     configurar UNA sola cosa para tener el sitio andando: para una familia
+ *     —decenas de fotos de unos cientos de kB— entra de sobra en el plan
+ *     gratuito.
+ *  3. **Disco**, en desarrollo local.
+ *
+ * En los tres casos la URL que se guarda es la misma, `/api/fotos/<archivo>`,
+ * así el árbol se puede mover de un lado a otro sin reescribir nada.
  */
 
 const DIR_UPLOADS = path.join(
   process.env.ARBOL_DIR ?? path.join(process.cwd(), "storage"),
   "uploads",
 );
-const usaBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+const UPSTASH_TOKEN =
+  process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+
+type Destino = "blob" | "redis" | "disco";
+
+const destino: Destino = process.env.BLOB_READ_WRITE_TOKEN
+  ? "blob"
+  : UPSTASH_URL && UPSTASH_TOKEN
+    ? "redis"
+    : "disco";
 
 const EXTENSIONES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -29,13 +49,30 @@ export function tipoAceptado(tipo: string): boolean {
   return tipo in EXTENSIONES;
 }
 
+function tipoDe(nombre: string): string {
+  const ext = nombre.split(".").pop()?.toLowerCase();
+  return ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
+}
+
+async function upstash(comando: string, body?: string): Promise<unknown> {
+  const res = await fetch(`${UPSTASH_URL}/${comando}`, {
+    method: body === undefined ? "GET" : "POST",
+    headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` },
+    body,
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Upstash ${comando}: ${res.status}`);
+  return (await res.json()).result;
+}
+
 export async function guardarFoto(archivo: File): Promise<string> {
   const ext = EXTENSIONES[archivo.type] ?? "jpg";
   const nombre = `${randomUUID()}.${ext}`;
+  const bytes = Buffer.from(await archivo.arrayBuffer());
 
-  if (usaBlob) {
+  if (destino === "blob") {
     const { put } = await import("@vercel/blob");
-    const { url } = await put(`fotos/${nombre}`, archivo, {
+    const { url } = await put(`fotos/${nombre}`, bytes, {
       access: "public",
       contentType: archivo.type,
       addRandomSuffix: false,
@@ -43,23 +80,30 @@ export async function guardarFoto(archivo: File): Promise<string> {
     return url;
   }
 
+  if (destino === "redis") {
+    await upstash(`set/${encodeURIComponent(`hdll:foto:${nombre}`)}`, bytes.toString("base64"));
+    return `/api/fotos/${nombre}`;
+  }
+
   await fs.mkdir(DIR_UPLOADS, { recursive: true });
-  const bytes = Buffer.from(await archivo.arrayBuffer());
   await fs.writeFile(path.join(DIR_UPLOADS, nombre), bytes);
   return `/api/fotos/${nombre}`;
 }
 
-/** Lee una foto local. Devuelve null si no existe o si el nombre es sospechoso. */
-export async function leerFotoLocal(
-  nombre: string,
-): Promise<{ bytes: Buffer; tipo: string } | null> {
+/** Lee una foto propia. Devuelve null si no existe o si el nombre es sospechoso. */
+export async function leerFoto(nombre: string): Promise<{ bytes: Buffer; tipo: string } | null> {
   // Sin subcarpetas ni "..": el nombre tiene que ser exactamente <uuid>.<ext>.
   if (!/^[a-f0-9-]{36}\.(jpg|png|webp)$/i.test(nombre)) return null;
+
+  if (destino === "redis") {
+    const crudo = (await upstash(`get/${encodeURIComponent(`hdll:foto:${nombre}`)}`)) as
+      | string
+      | null;
+    return crudo ? { bytes: Buffer.from(crudo, "base64"), tipo: tipoDe(nombre) } : null;
+  }
+
   try {
-    const bytes = await fs.readFile(path.join(DIR_UPLOADS, nombre));
-    const ext = nombre.split(".").pop()!.toLowerCase();
-    const tipo = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
-    return { bytes, tipo };
+    return { bytes: await fs.readFile(path.join(DIR_UPLOADS, nombre)), tipo: tipoDe(nombre) };
   } catch {
     return null;
   }
