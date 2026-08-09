@@ -311,16 +311,38 @@ servidor no procesa imágenes y la carga anda con datos móviles.
 
 ## Deploy en Vercel
 
-1. `git init && git add . && git commit` y subir a GitHub.
-2. En Vercel: **Add New → Project**, importar el repo. El framework se detecta
-   solo (Next.js); no hace falta tocar build ni output.
-3. **Storage → Marketplace → Upstash → Redis**, conectarlo al proyecto. Inyecta
-   `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`.
-4. **Storage → Blob**, crear un store y conectarlo. Inyecta
-   `BLOB_READ_WRITE_TOKEN`.
-5. Variables propias: `NEXT_PUBLIC_MODO_ABIERTO_HASTA=AAAA-MM-DD`.
-6. Redeploy y verificar en **Ajustes → Dónde se guarda** que diga
-   *Redis (Upstash)* y *los datos sobreviven al reinicio*.
+**Las variables del almacenamiento no se escriben a mano: las inyecta Vercel** al
+conectar cada integración. Sólo hay que conectarlas.
+
+1. En Vercel, proyecto → **Storage → Marketplace → Upstash → Redis**: crear una
+   base y **Connect** al proyecto. Quedan puestas `UPSTASH_REDIS_REST_URL` y
+   `UPSTASH_REDIS_REST_TOKEN` (o `KV_REST_API_*`, que el store también acepta).
+   El plan gratuito sobra: el árbol entero es un JSON de unos cientos de kB.
+2. **Storage → Blob**: crear un store y **Connect**. Queda `BLOB_READ_WRITE_TOKEN`,
+   que es donde van a parar las fotos.
+3. **Redeploy.** Las variables sólo aplican a deployments nuevos.
+4. Verificar en **Ajustes → Dónde se guarda** que diga *Redis (Upstash)* y
+   *los datos sobreviven al reinicio*.
+
+### Pasar el árbol de local a producción
+
+Una sola vez, desde el servidor:
+
+```bash
+SITIO=https://hastadondellegare.vercel.app \
+ADMIN_CLAVE=<la que pusiste en Vercel> \
+BLOB_READ_WRITE_TOKEN=<copiado de Vercel> \
+npm run publicar
+```
+
+Sube las fotos a Blob, reescribe las URLs y manda el árbol entero. **Sin el token
+de Blob las fotos se pierden**: en el árbol figuran como `/api/fotos/<uuid>.jpg`,
+archivos del disco del servidor que producción no puede alcanzar. El script
+avisa antes de hacerlo.
+
+`ADMIN_CLAVE` hace falta sólo para esto y mientras el acceso por enlace esté
+apagado; una vez encendido, manda el rol de la sesión y esa variable deja de
+usarse.
 
 `storage/` está en `.gitignore`: los datos reales de la familia **no** van al
 repositorio.
