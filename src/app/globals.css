@@ -704,3 +704,55 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .contacto { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 16px 0; }
 .contacto .btn { text-decoration: none; }
 .contacto-dir { font-size: 13px; color: var(--tinta-suave); }
+
+/* --------------------------------------------------- colores por apellido
+
+   Una línea de color por rama: cuando el apellido cambia, cambia el color, y
+   se ve de un vistazo dónde entra otra familia al árbol. El orden lo da la
+   frecuencia del apellido, así la rama principal se queda siempre con el
+   primero. Los tonos están elegidos para distinguirse también en oscuro. */
+
+:root {
+  --fam-0: #4f46e5;
+  --fam-1: #0d9488;
+  --fam-2: #c2410c;
+  --fam-3: #7c3aed;
+  --fam-4: #0369a1;
+  --fam-5: #a16207;
+  --fam-6: #be123c;
+  --fam-7: #15803d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) {
+    --fam-0: #a5b4fc;
+    --fam-1: #5eead4;
+    --fam-2: #fdba74;
+    --fam-3: #d8b4fe;
+    --fam-4: #7dd3fc;
+    --fam-5: #fcd34d;
+    --fam-6: #fda4af;
+    --fam-7: #86efac;
+  }
+}
+
+:root[data-tema="oscuro"] {
+  --fam-0: #a5b4fc;
+  --fam-1: #5eead4;
+  --fam-2: #fdba74;
+  --fam-3: #d8b4fe;
+  --fam-4: #7dd3fc;
+  --fam-5: #fcd34d;
+  --fam-6: #fda4af;
+  --fam-7: #86efac;
+}
+
+.enlace.filiacion.fam-0 { stroke: var(--fam-0); }
+.enlace.filiacion.fam-1 { stroke: var(--fam-1); }
+.enlace.filiacion.fam-2 { stroke: var(--fam-2); }
+.enlace.filiacion.fam-3 { stroke: var(--fam-3); }
+.enlace.filiacion.fam-4 { stroke: var(--fam-4); }
+.enlace.filiacion.fam-5 { stroke: var(--fam-5); }
+.enlace.filiacion.fam-6 { stroke: var(--fam-6); }
+.enlace.filiacion.fam-7 { stroke: var(--fam-7); }
+.enlace.filiacion { stroke-width: 1.8; opacity: 0.85; }

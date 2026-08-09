@@ -248,13 +248,17 @@ const HUECO_X = 28;
 const HUECO_PAREJA = 12;
 /** Entre familias que no comparten a nadie. */
 const HUECO_FAMILIA = 96;
-const HUECO_Y = 78;
+/** Alto entre generaciones. Generoso a propósito: las líneas de cada pareja
+ *  bajan por carriles distintos y necesitan lugar para no encimarse. */
+const HUECO_Y = 130;
 const PASO_Y = NODO_ALTO + HUECO_Y;
 const MARGEN = 48;
 
 export interface NodoUbicado {
   id: string;
   persona: Persona;
+  /** Índice de la familia (primer apellido), para pintar de un color por rama. */
+  familia: number;
   /** Generación relativa al foco: negativa hacia arriba, positiva hacia abajo. */
   gen: number;
   /** Esquina superior izquierda de la caja. */
@@ -280,6 +284,12 @@ export interface Union {
   y: number;
   /** Altura de la barra que une a la pareja (centro de las cajas). */
   alturaBarra: number;
+  /**
+   * Altura del tramo horizontal por el que corren las líneas hacia los hijos.
+   * Cada pareja tiene el suyo, así las de distintas familias no se superponen
+   * ni se confunden entre sí.
+   */
+  canal: number;
   izquierda: number;
   derecha: number;
   hijos: string[];
@@ -343,6 +353,28 @@ function agregar<T>(mapa: Map<string, Set<T>>, clave: string, valor: T) {
  *     sobre su descendencia.
  *  4. **Empaquetado.** Los árboles sueltos se ponen uno al lado del otro.
  */
+/** Primer apellido en mayúsculas: es como se identifica cada rama. */
+export function apellidoRama(p: Persona): string {
+  return (p.apellidos.trim().split(/\s+/)[0] ?? "").toUpperCase();
+}
+
+/**
+ * Un número por apellido, ordenado de más a menos frecuente, para asignarle un
+ * color estable a cada rama de la familia.
+ */
+export function familias(personas: Persona[]): Map<string, number> {
+  const conteo = new Map<string, number>();
+  for (const p of personas) {
+    const a = apellidoRama(p);
+    if (a) conteo.set(a, (conteo.get(a) ?? 0) + 1);
+  }
+  return new Map(
+    [...conteo.entries()]
+      .sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "es"))
+      .map(([a], i) => [a, i]),
+  );
+}
+
 export function diagramar(personas: Persona[]): Diagrama {
   if (!personas.length) return DIAGRAMA_VACIO;
 
@@ -563,6 +595,7 @@ export function diagramar(personas: Persona[]): Diagrama {
 
   const nivelMin = Math.min(...unidades.map((u) => nivel.get(u)!));
 
+  const ramas = familias(personas);
   const nodos: NodoUbicado[] = [];
   for (const u of unidades) {
     const gente = miembros.get(u)!;
@@ -571,6 +604,7 @@ export function diagramar(personas: Persona[]): Diagrama {
       nodos.push({
         id,
         persona: ix.get(id)!,
+        familia: ramas.get(apellidoRama(ix.get(id)!)) ?? 0,
         gen: nivel.get(u)!,
         x: x + MARGEN,
         y: (nivel.get(u)! - nivelMin) * PASO_Y + MARGEN,
@@ -618,6 +652,7 @@ export function diagramar(personas: Persona[]): Diagrama {
       // Las líneas a los hijos salen del borde inferior de la fila.
       y: base + NODO_ALTO,
       alturaBarra: base + NODO_ALTO / 2,
+      canal: base + NODO_ALTO + HUECO_Y / 2, // se reparte más abajo
       izquierda: hayHueco ? bordeIzq : Math.min(...centros),
       derecha: hayHueco ? bordeDer : Math.max(...centros),
       hijos: [],
@@ -642,6 +677,22 @@ export function diagramar(personas: Persona[]): Diagrama {
       const union = registrarUnion([p.id, v.personaId]);
       if (union) union.declarada = true;
     }
+  }
+
+  // Un carril distinto para cada pareja de la misma fila: si todas bajaran por
+  // el medio, las líneas de familias distintas se solaparían en un solo trazo.
+  const porFila = new Map<number, Union[]>();
+  for (const u of uniones.values()) {
+    if (!u.hijos.length) continue;
+    if (!porFila.has(u.y)) porFila.set(u.y, []);
+    porFila.get(u.y)!.push(u);
+  }
+  for (const lista of porFila.values()) {
+    lista.sort((a, b) => a.x - b.x);
+    lista.forEach((u, i) => {
+      const reparto = lista.length === 1 ? 0.5 : 0.22 + (0.56 * i) / (lista.length - 1);
+      u.canal = u.y + HUECO_Y * reparto;
+    });
   }
 
   const nivelMax = Math.max(...unidades.map((u) => nivel.get(u)!));

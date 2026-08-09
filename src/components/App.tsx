@@ -75,7 +75,9 @@ export default function App() {
 
   // Tema guardado, antes de que se vea nada.
   useEffect(() => {
-    const t = window.localStorage.getItem("hdll:tema");
+    // Claro por defecto: el árbol se lee mejor y es lo que espera la familia.
+    // Quien prefiera oscuro lo elige en Ajustes y queda guardado.
+    const t = window.localStorage.getItem("hdll:tema") ?? "claro";
     if (t === "claro" || t === "oscuro") document.documentElement.setAttribute("data-tema", t);
     setAutor(leerAutor());
   }, []);
@@ -84,7 +86,7 @@ export default function App() {
     setPersonas(lista);
     setFocoId((actual) => {
       if (actual && lista.some((p) => p.id === actual)) return actual;
-      return ordenarPorNacimiento(lista).at(-1)?.id ?? null;
+      return ordenarPorNacimiento(lista).at(0)?.id ?? null;
     });
   }, []);
 
@@ -100,8 +102,9 @@ export default function App() {
 
         const guardado = leerFocoGuardado();
         const valido = guardado && datos.personas.some((p) => p.id === guardado);
-        // Sin foco previo, arranca en la persona más joven: el árbol se lee hacia atrás.
-        setFocoId(valido ? guardado : (ordenarPorNacimiento(datos.personas).at(-1)?.id ?? null));
+        // Sin foco previo, arranca en la persona más antigua: es la raíz del
+        // árbol y desde ahí se lee todo hacia abajo.
+        setFocoId(valido ? guardado : (ordenarPorNacimiento(datos.personas).at(0)?.id ?? null));
       })
       .catch((e) => setErrorCarga(e instanceof Error ? e.message : "No se pudo cargar el árbol."))
       .finally(() => setCargando(false));

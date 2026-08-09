@@ -76,7 +76,7 @@ export default function Ajustes({
   const archivo = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setTema((window.localStorage.getItem("hdll:tema") as Tema) ?? "sistema");
+    setTema((window.localStorage.getItem("hdll:tema") as Tema) ?? "claro");
     setClave(leerClaveAdmin());
   }, []);
 

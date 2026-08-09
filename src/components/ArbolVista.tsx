@@ -65,16 +65,26 @@ const TEXTO_ANCHO = NODO_ANCHO - TEXTO_X - 14;
 const PIE_ANCHO = NODO_ANCHO - 30;
 
 
-/** Codo redondeado desde el punto de unión de los padres hasta el hijo. */
-function caminoFiliacion(x1: number, y1: number, x2: number, y2: number): string {
+/**
+ * Codo redondeado desde el punto de unión de los padres hasta el hijo, pasando
+ * por `canal`: el carril horizontal propio de esa pareja. Sin carriles propios,
+ * las líneas de familias distintas se pisan y se leen como una sola.
+ */
+function caminoFiliacion(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  canal: number,
+): string {
   if (y2 <= y1) return `M${x1},${y1} L${x2},${y2}`;
 
-  const ym = (y1 + y2) / 2;
+  const ym = Math.min(Math.max(canal, y1 + 8), y2 - 8);
   const dx = x2 - x1;
   if (Math.abs(dx) < 1) return `M${x1},${y1} L${x2},${y2}`;
 
   const dir = Math.sign(dx);
-  const r = Math.min(14, Math.abs(dx) / 2, (y2 - y1) / 2);
+  const r = Math.min(14, Math.abs(dx) / 2, Math.abs(ym - y1), Math.abs(y2 - ym));
   return [
     `M${x1},${y1}`,
     `L${x1},${ym - r}`,
@@ -346,11 +356,19 @@ export default function ArbolVista({
                 {u.hijos.map((idHijo) => {
                   const hijo = porId.get(idHijo);
                   if (!hijo) return null;
+                  // El color es el de la rama del hijo: cuando cambia el
+                  // apellido, cambia el color, y se ve dónde empieza otra familia.
                   return (
                     <path
                       key={idHijo}
-                      className="enlace filiacion"
-                      d={caminoFiliacion(u.x, u.y, hijo.x + NODO_ANCHO / 2, hijo.y)}
+                      className={`enlace filiacion fam-${hijo.familia % 8}`}
+                      d={caminoFiliacion(
+                        u.x,
+                        u.y,
+                        hijo.x + NODO_ANCHO / 2,
+                        hijo.y,
+                        u.canal,
+                      )}
                     />
                   );
                 })}

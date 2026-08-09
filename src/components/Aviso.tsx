@@ -37,8 +37,6 @@ export default function Aviso({ restringido }: { restringido: boolean }) {
           <span className="aviso-detalle">
             {" "}
             Cualquiera puede sumar personas y corregir datos; borrar, sólo el administrador.
-            Aun así, pedí permiso antes de publicar el teléfono o la dirección de otra
-            persona.
           </span>
         </p>
         <button
@@ -66,9 +64,6 @@ export default function Aviso({ restringido }: { restringido: boolean }) {
           {" "}
           Es a propósito: así la familia carga lo que sabe sin trámite. Después vamos a
           cerrarlo y mandar accesos personales por <em>magic link</em> al correo de cada uno.
-          Por eso conviene <strong>no cargar datos sensibles</strong> (documentos, datos
-          bancarios) y pedir permiso antes de publicar el teléfono o la dirección de otra
-          persona.
         </span>{" "}
         {!abierto && (
           <button className="btn chico fantasma ver-mas" onClick={() => setAbierto(true)}>
