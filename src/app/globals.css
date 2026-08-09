@@ -139,6 +139,16 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .app { display: flex; flex-direction: column; min-height: 100vh; }
 
+/* En pantalla grande la app ocupa exactamente el alto de la ventana y cada
+   panel scrollea por dentro. Sin esto, la ficha lateral —que con el linaje
+   completo puede medir dos mil píxeles— estira toda la fila, y el árbol termina
+   dibujado por debajo del borde inferior: el lienzo se ve vacío. */
+@media (min-width: 901px) {
+  .app { height: 100vh; overflow: hidden; }
+  .contenido { min-height: 0; }
+  .lienzo { min-height: 0; }
+}
+
 .cabecera {
   position: sticky;
   top: 0;

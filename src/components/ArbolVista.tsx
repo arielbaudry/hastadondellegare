@@ -98,8 +98,13 @@ export default function ArbolVista({
   const ultimoClic = useRef<{ id: string; cuando: number } | null>(null);
   /** Hubo arrastre en este gesto: el clic final no debe contar como selección. */
   const arrastro = useRef(false);
-  /** El encuadre automático corre una sola vez; después manda el usuario. */
-  const yaEncuadro = useRef(false);
+  /**
+   * ¿El usuario ya movió la cámara? Mientras no la haya tocado, el árbol se
+   * reencuadra solo —hace falta: los carteles de arriba aparecen y se cierran
+   * después del primer render y cambian el alto del lienzo—. En cuanto arrastra,
+   * hace zoom o elige a alguien, la cámara pasa a ser suya y no se toca más.
+   */
+  const camaraTocada = useRef(false);
 
   // El dibujo ya no depende del foco: cambiar de persona no rearma el árbol ni
   // mueve la cámara, sólo cambia a quién se resalta.
@@ -212,15 +217,8 @@ export default function ArbolVista({
     });
   }, [focoId, porId, personas]);
 
-  // Sólo la primera vez que se puede medir el lienzo. Después la cámara es del
-  // usuario: si se reencuadrara con cada cambio del árbol, guardar una ficha o
-  // que otro pariente cargue a alguien te tiraría el zoom abajo.
   useEffect(() => {
-    if (yaEncuadro.current) return;
-    const caja = contenedor.current?.getBoundingClientRect();
-    if (!caja?.height || !diagrama.nodos.length) return;
-    yaEncuadro.current = true;
-    encuadrar();
+    if (!camaraTocada.current) encuadrar();
   }, [encuadrar, diagrama]);
 
   /**
@@ -234,6 +232,7 @@ export default function ArbolVista({
       primerEncuadre.current = false;
       return;
     }
+    camaraTocada.current = true;
     centrarEnFoco();
     // Sólo al cambiar de persona: recalcular el diagrama no debe mover la cámara.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -246,6 +245,7 @@ export default function ArbolVista({
     if (!el) return;
     const alGirar = (e: WheelEvent) => {
       e.preventDefault();
+      camaraTocada.current = true;
       const caja = el.getBoundingClientRect();
       const mx = e.clientX - caja.left;
       const my = e.clientY - caja.top;
@@ -262,6 +262,7 @@ export default function ArbolVista({
   function zoom(factor: number) {
     const caja = contenedor.current?.getBoundingClientRect();
     if (!caja) return;
+    camaraTocada.current = true;
     const mx = caja.width / 2;
     const my = caja.height / 2;
     setCamara((c) => {
@@ -299,6 +300,7 @@ export default function ArbolVista({
         if (!arrastrando) {
           if (Math.abs(dx) + Math.abs(dy) < 4) return; // todavía puede ser un clic
           arrastro.current = true;
+          camaraTocada.current = true;
           setArrastrando(true);
           e.currentTarget.setPointerCapture(e.pointerId);
         }
@@ -471,7 +473,15 @@ export default function ArbolVista({
         <button className="btn chico" onClick={() => zoom(1.25)} aria-label="Acercar">+</button>
         <button className="btn chico" onClick={() => zoom(0.8)} aria-label="Alejar">−</button>
         <button className="btn chico" onClick={centrarEnFoco}>Mi entorno</button>
-        <button className="btn chico" onClick={encuadrar}>Ver todo</button>
+        <button
+          className="btn chico"
+          onClick={() => {
+            camaraTocada.current = false;
+            encuadrar();
+          }}
+        >
+          Ver todo
+        </button>
       </div>
     </div>
   );
