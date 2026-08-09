@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+.vercel/
+next-env.d.ts
+*.tsbuildinfo
+
+# Datos reales de la familia: nunca al repositorio público.
+storage/tree.json
+storage/uploads/
+storage/log.jsonl
+storage/*.bak.json
+storage/*.log
+
+.env
+.env.local

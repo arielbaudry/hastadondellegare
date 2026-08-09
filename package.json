@@ -1,0 +1,27 @@
+{
+  "name": "hastadondellegare",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hasta dónde llegaré — árbol genealógico familiar colaborativo",
+  "scripts": {
+    "dev": "next dev -p 8096",
+    "build": "next build",
+    "start": "next start -p 8096",
+    "seed": "node scripts/seed.mjs",
+    "reset": "node scripts/seed.mjs --vaciar"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.7.0",
+    "next": "^16.3.0",
+    "nodemailer": "^9.0.5",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/nodemailer": "^8.0.1",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0"
+  }
+}
