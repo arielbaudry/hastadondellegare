@@ -1,16 +1,25 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { ARBOL_VACIO, type Arbol, type Persona } from "./types";
+import {
+  ConflictoDeVersion,
+  escribirArchivo,
+  githubConfigurado,
+  leerArchivo,
+  leerVersionAnterior,
+} from "./github";
 
 /**
- * Almacenamiento del árbol. Un solo documento JSON, dos drivers:
+ * Almacenamiento del árbol. **Acá no hay base de datos**: el árbol entero es un
+ * único documento JSON. Lo único que cambia es dónde se guarda ese archivo:
  *
- *  - `fs`    : desarrollo local -> storage/tree.json (+ backup .bak.json)
- *  - `redis` : producción en Vercel -> Upstash Redis por REST (sin dependencias)
+ *  - `github`: un JSON en un repositorio privado. Trae historial de cada cambio
+ *              y control de concurrencia real (ver `github.ts`).
+ *  - `redis` : Upstash por REST, si se prefiere.
+ *  - `fs`    : disco, en desarrollo local -> storage/tree.json (+ .bak.json)
  *
- * Se elige solo: si están las variables de Upstash, usa Redis; si no, disco.
- * El filesystem de Vercel es efímero, así que en producción el driver `fs`
- * perdería todo en cada deploy: por eso el arranque avisa si falta la config.
+ * Se elige solo, en ese orden. En Vercel hace falta uno de los dos primeros
+ * porque su disco es de sólo lectura; el arranque avisa si no hay ninguno.
  */
 
 const CLAVE = process.env.ARBOL_KEY ?? "hastadondellegare:arbol";
@@ -27,20 +36,31 @@ const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_AP
 const UPSTASH_TOKEN =
   process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
 
-export type Driver = "fs" | "redis";
-export const driver: Driver = UPSTASH_URL && UPSTASH_TOKEN ? "redis" : "fs";
+export type Driver = "fs" | "redis" | "github";
+export const driver: Driver = githubConfigurado()
+  ? "github"
+  : UPSTASH_URL && UPSTASH_TOKEN
+    ? "redis"
+    : "fs";
+
+const NOMBRES: Record<Driver, string> = {
+  github: "archivo JSON en GitHub",
+  redis: "Redis (Upstash)",
+  fs: "disco local",
+};
+export const nombreDriver = NOMBRES[driver];
 
 export function puedeGuardar(): boolean {
-  return driver === "redis" || process.env.VERCEL !== "1";
+  return driver !== "fs" || process.env.VERCEL !== "1";
 }
 
 export function estadoAlmacenamiento() {
   return {
-    driver,
+    driver: nombreDriver,
     persistente: puedeGuardar(),
     advertencia:
       driver === "fs" && process.env.VERCEL === "1"
-        ? "Estás en Vercel sin Upstash configurado: el disco es efímero y los datos se pierden en cada deploy. Configurá UPSTASH_REDIS_REST_URL y UPSTASH_REDIS_REST_TOKEN."
+        ? "En Vercel el disco es de sólo lectura, así que no se puede guardar nada. Configurá GITHUB_REPO y GITHUB_TOKEN para que el árbol viva como un JSON en un repositorio privado, o UPSTASH_REDIS_REST_URL y UPSTASH_REDIS_REST_TOKEN."
         : null,
   };
 }
@@ -105,6 +125,31 @@ async function respaldarRedis(arbol: Arbol): Promise<void> {
   await upstash(`set/${encodeURIComponent(`${CLAVE}:previo`)}`, JSON.stringify(arbol));
 }
 
+// ------------------------------------------------------------ driver: github
+
+const RUTA_ARBOL = process.env.GITHUB_ARCHIVO ?? "arbol.json";
+/** sha de la versión leída, para que GitHub detecte escrituras pisadas. */
+let shaArbol: string | null = null;
+
+async function leerGithub(): Promise<Arbol> {
+  const archivo = await leerArchivo(RUTA_ARBOL);
+  if (!archivo) {
+    shaArbol = null;
+    return { ...ARBOL_VACIO };
+  }
+  shaArbol = archivo.sha;
+  return JSON.parse(archivo.bytes.toString("utf8")) as Arbol;
+}
+
+async function escribirGithub(arbol: Arbol, resumen: string): Promise<void> {
+  shaArbol = await escribirArchivo(
+    RUTA_ARBOL,
+    Buffer.from(JSON.stringify(arbol, null, 2), "utf8"),
+    resumen,
+    shaArbol,
+  );
+}
+
 // ------------------------------------------------------------- API del store
 
 /**
@@ -128,7 +173,8 @@ function migrar(arbol: Arbol): void {
 }
 
 export async function leerArbol(): Promise<Arbol> {
-  const arbol = driver === "redis" ? await leerRedis() : await leerFs();
+  const arbol =
+    driver === "github" ? await leerGithub() : driver === "redis" ? await leerRedis() : await leerFs();
   migrar(arbol);
   return arbol;
 }
@@ -136,21 +182,32 @@ export async function leerArbol(): Promise<Arbol> {
 /** Lee, aplica `cambio`, incrementa `rev` y guarda. Devuelve el árbol nuevo. */
 export async function mutarArbol(
   cambio: (arbol: Arbol) => void | Promise<void>,
+  resumen = "Actualiza el árbol",
 ): Promise<Arbol> {
   const paso = cola.then(async () => {
-    const arbol = await leerArbol();
-    // Se guarda cómo estaba ANTES de tocar nada, para que "deshacer" funcione.
-    const antes = JSON.parse(JSON.stringify(arbol)) as Arbol;
-    await cambio(arbol);
-    arbol.rev += 1;
-    arbol.actualizadoEn = new Date().toISOString();
-    if (driver === "redis") {
-      await respaldarRedis(antes);
-      await escribirRedis(arbol);
-    } else {
-      await escribirFs(arbol);
+    // Con GitHub la escritura puede rebotar si otro guardó en el medio: se
+    // vuelve a leer y se aplica el cambio sobre la versión nueva. Es el mismo
+    // reintento de siempre, pero acá el conflicto se detecta de verdad en vez
+    // de que gane el último que escribe.
+    for (let intento = 0; ; intento++) {
+      const arbol = await leerArbol();
+      const antes = JSON.parse(JSON.stringify(arbol)) as Arbol;
+      await cambio(arbol);
+      arbol.rev += 1;
+      arbol.actualizadoEn = new Date().toISOString();
+
+      try {
+        if (driver === "github") await escribirGithub(arbol, resumen);
+        else if (driver === "redis") {
+          await respaldarRedis(antes);
+          await escribirRedis(arbol);
+        } else await escribirFs(arbol);
+        return arbol;
+      } catch (err) {
+        if (!(err instanceof ConflictoDeVersion) || intento >= 3) throw err;
+        shaArbol = null; // fuerza releer la versión buena
+      }
     }
-    return arbol;
   });
   cola = paso.catch(() => {}); // un fallo no debe trabar la cola
   return paso;
@@ -164,7 +221,11 @@ export async function mutarArbol(
 export async function deshacer(): Promise<Arbol | null> {
   const paso = cola.then(async () => {
     let previo: Arbol | null = null;
-    if (driver === "redis") {
+    if (driver === "github") {
+      // La copia anterior es el commit anterior: no hace falta guardar nada.
+      const bytes = await leerVersionAnterior(RUTA_ARBOL);
+      previo = bytes ? (JSON.parse(bytes.toString("utf8")) as Arbol) : null;
+    } else if (driver === "redis") {
       const crudo = (await upstash(`get/${encodeURIComponent(`${CLAVE}:previo`)}`)) as string | null;
       previo = crudo ? (JSON.parse(crudo) as Arbol) : null;
     } else {
@@ -182,7 +243,9 @@ export async function deshacer(): Promise<Arbol | null> {
       rev: actual.rev + 1,
       actualizadoEn: new Date().toISOString(),
     };
-    if (driver === "redis") {
+    if (driver === "github") {
+      await escribirGithub(restaurado, "Deshace el último cambio");
+    } else if (driver === "redis") {
       await upstash(`set/${encodeURIComponent(`${CLAVE}:previo`)}`, JSON.stringify(actual));
       await escribirRedis(restaurado);
     } else {

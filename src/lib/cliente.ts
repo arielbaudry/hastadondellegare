@@ -4,7 +4,7 @@ import type { Arbol, Persona, PersonaEntrada } from "./types";
 
 /** Estado del almacenamiento que informa /api/arbol. */
 export interface EstadoAlmacenamiento {
-  driver: "fs" | "redis";
+  driver: string;
   persistente: boolean;
   advertencia: string | null;
 }

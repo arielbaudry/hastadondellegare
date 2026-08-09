@@ -58,10 +58,11 @@ Lo que conviene tener presente antes de tocar código:
   Los tokens están todos en `:root` de `globals.css`; el modo oscuro sólo
   redefine los que cambian, en los dos bloques (`prefers-color-scheme` y
   `[data-tema]`).
-- **Persistencia**: disco en local, Upstash Redis en producción. Es lo único
-  imprescindible para desplegar — las fotos van a la misma base si no hay Blob
-  configurado, justamente para que haya UNA sola cosa que configurar. No sumar
-  dependencias de infraestructura sin necesidad: es un sitio familiar.
+- **No hay base de datos y no hay que agregarla.** El árbol es un archivo JSON;
+  lo único que cambia entre entornos es dónde se guarda: repo de GitHub
+  (recomendado, da historial y control de concurrencia), Upstash, o disco en
+  local. Las fotos van siempre al mismo lugar que el árbol. Es un sitio
+  familiar: no sumar infraestructura sin una razón concreta.
 - **Puerto local 8096** (`scripts/start_local.sh`, `@reboot` en el crontab,
   regla ufw para `192.168.1.0/24`).
 - `storage/` está en `.gitignore`: los datos de la familia no van al repo.

@@ -299,7 +299,7 @@ export default function Ajustes({
           {almacenamiento ? (
             <ul className="lista-simple">
               <li>
-                Driver: <strong>{almacenamiento.driver === "redis" ? "Redis (Upstash)" : "disco local"}</strong>
+                Se guarda en: <strong>{almacenamiento.driver}</strong>
               </li>
               <li>
                 Persistencia:{" "}

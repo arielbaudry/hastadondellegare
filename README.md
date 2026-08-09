@@ -311,37 +311,50 @@ servidor no procesa imágenes y la carga anda con datos móviles.
 
 ## Deploy en Vercel
 
-Hace falta **una sola cosa**: un lugar donde guardar los datos. En Vercel el
-disco es de sólo lectura, así que sin eso el sitio abre vacío y avisa.
+**No hay base de datos en este proyecto.** El árbol entero es un archivo JSON.
+Lo único que hace falta resolver es *dónde* guardarlo, porque el disco de Vercel
+es de sólo lectura y ahí un archivo no se puede escribir.
 
-**1. Una base gratis en Upstash** (dos minutos, no requiere tarjeta):
+La opción recomendada es **guardarlo en un repositorio privado de GitHub**, que
+ya está a mano y encima resuelve otras dos cosas de arriba:
 
-- entrar a [upstash.com](https://upstash.com), crear cuenta,
-  **Create Database** → Redis, la región más cercana;
-- en la pantalla de la base, sección **REST API**, copiar los dos valores:
-  `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`.
+- **historial de todo**: cada cambio queda como un commit, con qué se modificó y
+  cuándo. Para un árbol que editan veinte parientes vale más que cualquier
+  respaldo manual — y es lo que usa el botón *Deshacer*;
+- **dos personas guardando a la vez no se pisan**: GitHub exige mandar la
+  versión que uno leyó y rechaza la escritura si cambió en el medio. Ante un
+  choque se relee y se reintenta, en vez de que gane el último.
 
-> También se puede llegar desde Vercel (**Storage → Marketplace → Upstash**),
-> que hace lo mismo y conecta las variables solo. Si esa pantalla no aparece o
-> confunde, el camino de arriba es equivalente y funciona en cualquier plan.
+**1. Un repositorio privado para los datos.** Aparte del código, porque acá van
+teléfonos y direcciones. Por ejemplo `arielbaudry/hastadondellegare-datos`,
+marcado **Private**.
 
-**2. Pegarlas en Vercel**: proyecto → **Settings → Environment Variables**, tres
-variables:
+**2. Un token de acceso.** GitHub → *Settings → Developer settings → Personal
+access tokens → Fine-grained tokens → Generate new token*:
+
+- **Repository access**: sólo ese repositorio;
+- **Permissions → Repository permissions → Contents: Read and write**;
+- copiar el token (empieza con `github_pat_`).
+
+**3. Pegar tres variables en Vercel** (*Settings → Environment Variables*):
 
 | Variable | Valor |
 |---|---|
-| `UPSTASH_REDIS_REST_URL` | el que copiaste |
-| `UPSTASH_REDIS_REST_TOKEN` | el que copiaste |
+| `GITHUB_REPO` | `arielbaudry/hastadondellegare-datos` |
+| `GITHUB_TOKEN` | el token que copiaste |
 | `ADMIN_CLAVE` | cualquier cosa larga que inventes |
 
-**3. Redeploy.** Las variables sólo aplican a deployments nuevos.
+**4. Redeploy** y verificar en Ajustes → *Dónde se guarda*: tiene que decir
+*archivo JSON en GitHub*.
 
-**4. Verificar** en Ajustes → *Dónde se guarda*: tiene que decir *Redis (Upstash)*
-y *los datos sobreviven al reinicio*.
+Las fotos van al mismo repositorio, al lado del JSON. No hay nada más que
+configurar.
 
-Las fotos van a la misma base. **Vercel Blob es opcional**: si algún día son
-muchas, se conecta un store y con sólo tener `BLOB_READ_WRITE_TOKEN` las nuevas
-empiezan a ir ahí, sin tocar código ni migrar nada.
+> **¿Y si preferís Upstash?** También funciona: con
+> `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` (una base Redis gratis
+> de [upstash.com](https://upstash.com)) el árbol se guarda ahí. Y `BLOB_READ_WRITE_TOKEN`
+> manda las fotos a Vercel Blob, si algún día son muchísimas. Los tres caminos
+> guardan exactamente el mismo JSON; cambia sólo el estante.
 
 ### Pasar el árbol de local a producción
 
