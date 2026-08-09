@@ -84,7 +84,13 @@ async function pedir<T>(url: string, opciones?: RequestInit): Promise<T> {
  * la respuesta ya viene con lo necesario para pintar la pantalla de acceso.
  */
 export async function traerArbol(): Promise<RespuestaArbol> {
-  const res = await fetch("/api/arbol", { cache: "no-store" });
+  // La clave viaja también acá: es esta respuesta la que dice si se puede
+  // borrar. Sin la cabecera, desbloquear en Ajustes siempre fallaba.
+  const clave = leerClaveAdmin();
+  const res = await fetch("/api/arbol", {
+    cache: "no-store",
+    headers: clave ? { "x-clave-admin": clave } : {},
+  });
   // El cuerpo puede venir vacío si el servidor se cae de verdad: parsear a
   // ciegas mostraba "Unexpected end of JSON input" en vez del problema real.
   const crudo = await res.text();
