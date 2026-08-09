@@ -40,6 +40,18 @@ cuenta de DAS Latam: esto es familiar, no de trabajo.
 6. **Ajustes** tiene **Deshacer el último cambio**, respaldos (JSON/CSV), tema y
    el desbloqueo de administración.
 
+### Parentescos
+
+La ficha no lista «padres, abuelos, tíos»: calcula **cómo se llama cada vínculo**
+y muestra el linaje entero, de lo cercano a lo lejano — «tía abuela», «primo
+segundo», «bisnieta», «cuñado», «madrastra». El método es el clásico de
+genealogía (`src/lib/parentesco.ts`): se busca el antepasado común más cercano y
+se miran las dos distancias hasta él.
+
+Para decir «tía abuela» y no «tío/a abuelo/a» hace falta saber el género, así
+que hay un campo opcional. Sin dato se muestra la forma neutra: nadie está
+obligado a completarlo.
+
 ### Fotos
 
 Cada persona tiene **una galería, no una foto**: se suman y ninguna pisa a la
@@ -312,6 +324,39 @@ servidor no procesa imágenes y la carga anda con datos móviles.
 repositorio.
 
 ---
+
+## Acceso: magic links
+
+No hay contraseñas. Se pide un enlace al correo, y **sólo lo recibe quien ya
+tiene una ficha en el árbol con ese correo cargado**: no hay registro abierto.
+Quien todavía no figura, escribe a Ariel — su correo y su teléfono están en la
+misma pantalla de acceso.
+
+| Quién | Ve | Suma y corrige | Elimina |
+|---|---|---|---|
+| Sin sesión | — | — | — |
+| Colaborador (cualquiera con ficha y correo) | ✔ | ✔ | — |
+| Administrador (`ADMIN_EMAIL`) | ✔ | ✔ | ✔ |
+
+Detalles que importan:
+
+- **Sin sesión no se manda el árbol**, ni para leer. Tiene teléfonos y
+  direcciones de la familia; no es material para dejar suelto en internet.
+- **La respuesta al pedir el enlace es siempre la misma**, exista o no ese
+  correo. Si dijera «ese correo no está», cualquiera podría averiguar quién
+  figura en el árbol probando direcciones.
+- El enlace vale **media hora**; la sesión, tres meses. Ambos van firmados y sin
+  estado (HMAC), así funcionan igual en Vercel, donde no hay disco ni memoria
+  compartida entre invocaciones.
+- La firma **no alcanza**: al entrar, y en cada carga del árbol, se comprueba
+  que el correo siga estando en alguna ficha. A quien saquen del árbol se le
+  cae la sesión en el acto.
+- **El candado se enciende solo si están `SESION_SECRETO` y el SMTP.** Sin eso
+  el sitio queda abierto como estaba. Es a propósito: un deploy a medio
+  configurar no puede dejar a la familia —ni a Ariel— afuera.
+
+El correo sale por el **SMTP de DAS Latam** (Ferozo); las credenciales van por
+variables de entorno, nunca al repositorio.
 
 ## Nadie borra
 

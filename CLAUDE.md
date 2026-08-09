@@ -28,6 +28,9 @@ Lo que conviene tener presente antes de tocar código:
   la que cuelgan.
 - **Los roles van aparte** (`rolesRespectoA()`), justamente para que cambiar de
   foco no rearme el diagrama ni mueva la cámara.
+- **Los parentescos se calculan, no se cargan** (`src/lib/parentesco.ts`). El
+  campo `genero` existe sólo para nombrarlos bien y es opcional: sin dato va la
+  forma neutra ("tío/a abuelo/a").
 - **`fotos` es una lista, nunca un campo único.** Se suman y ninguna pisa a la
   anterior; la primera es el retrato. `store.migrar()` convierte el viejo
   `fotoUrl` en cada lectura: sin eso, un árbol guardado antes aparecería sin
@@ -72,6 +75,20 @@ Lo que conviene tener presente antes de tocar código:
   `~/.ssh/id_ed25519_hastadondellegare`, con el host `github-hastadondellegare`
   en `~/.ssh/config`. Es una *deploy key* del repo, no una credencial de la
   cuenta: sirve para este repo y para nada más.
+
+## Acceso y roles
+
+Magic link al correo cargado en la ficha (`src/lib/sesion.ts`, `src/lib/permisos.ts`).
+`ADMIN_EMAIL` es el único que borra; el resto colabora. Tres invariantes que no
+hay que aflojar:
+
+1. **El candado se enciende solo si `SESION_SECRETO` y el SMTP están puestos.**
+   Sin eso el sitio queda abierto. Un deploy a medio configurar no puede dejar a
+   nadie afuera.
+2. **La respuesta de `/api/acceso/solicitar` es idéntica exista o no el correo.**
+   Si no, se puede enumerar quién está en el árbol.
+3. **La firma no alcanza**: al entrar y en cada `/api/arbol` se verifica que el
+   correo siga en alguna ficha. Si no, la sesión se cae.
 
 ## Nadie borra
 
