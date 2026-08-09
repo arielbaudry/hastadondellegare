@@ -292,6 +292,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .lienzo {
   position: relative; flex: 1; overflow: hidden; cursor: grab;
+  /* Arrastrar el árbol no puede seleccionar texto ni tarjetas: quedaba todo
+     pintado de azul y el gesto se sentía roto. */
+  user-select: none; -webkit-user-select: none;
+  touch-action: none;
   background:
     radial-gradient(circle at 1px 1px, var(--punto) 1.1px, transparent 0) 0 0 / 24px 24px,
     var(--fondo);
@@ -675,3 +679,18 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .acceso-contacto { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
 .acceso-contacto a { font-weight: 550; }
+
+/* Cerrar la ficha lateral: el árbol se queda con toda la pantalla. */
+.panel-cuerpo { position: relative; }
+.cerrar-panel {
+  position: absolute; top: 0; right: 0; z-index: 2;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--linea); background: var(--superficie);
+  color: var(--tinta-tenue); cursor: pointer; font-size: 13px; line-height: 1;
+}
+.cerrar-panel:hover { border-color: var(--acento); color: var(--acento); }
+
+/* Contacto de la ficha: acciones, no texto muerto. */
+.contacto { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 16px 0; }
+.contacto .btn { text-decoration: none; }
+.contacto-dir { font-size: 13px; color: var(--tinta-suave); }

@@ -96,6 +96,10 @@ export default function ArbolVista({
   const [arrastrando, setArrastrando] = useState(false);
   const ultimo = useRef<{ x: number; y: number } | null>(null);
   const ultimoClic = useRef<{ id: string; cuando: number } | null>(null);
+  /** Hubo arrastre en este gesto: el clic final no debe contar como selección. */
+  const arrastro = useRef(false);
+  /** El encuadre automático corre una sola vez; después manda el usuario. */
+  const yaEncuadro = useRef(false);
 
   // El dibujo ya no depende del foco: cambiar de persona no rearma el árbol ni
   // mueve la cámara, sólo cambia a quién se resalta.
@@ -208,10 +212,16 @@ export default function ArbolVista({
     });
   }, [focoId, porId, personas]);
 
-  // Sólo al cambiar el árbol o el tamaño; elegir a alguien no reencuadra.
+  // Sólo la primera vez que se puede medir el lienzo. Después la cámara es del
+  // usuario: si se reencuadrara con cada cambio del árbol, guardar una ficha o
+  // que otro pariente cargue a alguien te tiraría el zoom abajo.
   useEffect(() => {
+    if (yaEncuadro.current) return;
+    const caja = contenedor.current?.getBoundingClientRect();
+    if (!caja?.height || !diagrama.nodos.length) return;
+    yaEncuadro.current = true;
     encuadrar();
-  }, [encuadrar]);
+  }, [encuadrar, diagrama]);
 
   /**
    * Al elegir a alguien, el árbol se acomoda para mostrarla con su entorno. Es
@@ -275,6 +285,7 @@ export default function ArbolVista({
       className={`lienzo${arrastrando ? " arrastrando" : ""}`}
       onPointerDown={(e) => {
         if (e.button !== 0) return;
+        arrastro.current = false;
         ultimo.current = { x: e.clientX, y: e.clientY };
         // Ojo: la captura del puntero NO se toma acá. Si se toma en el
         // pointerdown, los clics se despachan al contenedor en vez de a la
@@ -287,6 +298,7 @@ export default function ArbolVista({
         const dy = e.clientY - ultimo.current.y;
         if (!arrastrando) {
           if (Math.abs(dx) + Math.abs(dy) < 4) return; // todavía puede ser un clic
+          arrastro.current = true;
           setArrastrando(true);
           e.currentTarget.setPointerCapture(e.pointerId);
         }
@@ -366,6 +378,9 @@ export default function ArbolVista({
                 // entre medio hay arrastre y captura de puntero, y el evento
                 // nativo se pierde según dónde termine el gesto.
                 onClick={() => {
+                  // Soltar el arrastre encima de una tarjeta no es elegirla:
+                  // eso hacía perder el zoom cada vez que uno movía el árbol.
+                  if (arrastro.current) return;
                   const ahora = Date.now();
                   const previo = ultimoClic.current;
                   ultimoClic.current = { id: n.id, cuando: ahora };

@@ -85,9 +85,19 @@ async function pedir<T>(url: string, opciones?: RequestInit): Promise<T> {
  */
 export async function traerArbol(): Promise<RespuestaArbol> {
   const res = await fetch("/api/arbol", { cache: "no-store" });
-  const datos = (await res.json()) as RespuestaArbol;
-  if (!res.ok && res.status !== 401) throw new Error("No se pudo cargar el árbol.");
-  return datos;
+  // El cuerpo puede venir vacío si el servidor se cae de verdad: parsear a
+  // ciegas mostraba "Unexpected end of JSON input" en vez del problema real.
+  const crudo = await res.text();
+  let datos: Partial<RespuestaArbol> & { error?: string } = {};
+  try {
+    datos = crudo ? JSON.parse(crudo) : {};
+  } catch {
+    throw new Error(`El servidor respondió algo que no es JSON (HTTP ${res.status}).`);
+  }
+  if (!res.ok && res.status !== 401) {
+    throw new Error(datos.error ?? `No se pudo cargar el árbol (HTTP ${res.status}).`);
+  }
+  return datos as RespuestaArbol;
 }
 
 export async function cerrarSesion(): Promise<void> {

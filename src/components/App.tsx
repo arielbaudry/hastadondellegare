@@ -67,6 +67,7 @@ export default function App() {
   const [focoId, setFocoId] = useState<string | null>(null);
   /** Personas por las que se pasó, para poder volver sobre los pasos. */
   const [historial, setHistorial] = useState<string[]>([]);
+  const [panelAbierto, setPanelAbierto] = useState(true);
   const [edicion, setEdicion] = useState<Edicion>(null);
   const [guardando, setGuardando] = useState(false);
   const [errorForm, setErrorForm] = useState<string | null>(null);
@@ -352,6 +353,15 @@ export default function App() {
         </button>
       </header>
 
+      {almacenamiento?.advertencia && (
+        <div className="aviso rojo">
+          <span aria-hidden="true">⚠️</span>
+          <p style={{ margin: 0 }}>
+            <strong>Nada de lo que cargues se va a guardar.</strong> {almacenamiento.advertencia}
+          </p>
+        </div>
+      )}
+
       {esEjemplo && (
         <div className="aviso rojo">
           <span aria-hidden="true">🧪</span>
@@ -370,8 +380,11 @@ export default function App() {
         <div className="vacio">Cargando el árbol…</div>
       ) : errorCarga ? (
         <div className="vacio">
-          <h2>No se pudo cargar</h2>
-          <p>{errorCarga}</p>
+          <h2>No se pudo cargar el árbol</h2>
+          <p className="prosa" style={{ maxWidth: 520, margin: "0 auto" }}>{errorCarga}</p>
+          <button className="btn" style={{ marginTop: 18 }} onClick={() => window.location.reload()}>
+            Reintentar
+          </button>
         </div>
       ) : personas.length === 0 ? (
         <div className="vacio">
@@ -414,6 +427,11 @@ export default function App() {
                 ))}
               </div>
 
+              {!panelAbierto && (
+                <button className="btn chico" onClick={() => setPanelAbierto(true)}>
+                  Ver ficha
+                </button>
+              )}
               <button
                 className="btn chico"
                 onClick={() => setEdicion({ modo: "editar", persona: foco })}
@@ -428,18 +446,22 @@ export default function App() {
               <ArbolVista
                 personas={personas}
                 focoId={focoId}
-                onFoco={(id) => irA(id, { verArbol: false })}
+                onFoco={(id) => {
+                  setPanelAbierto(true);
+                  irA(id, { verArbol: false });
+                }}
                 onEditar={(id) => {
                   const p = personas.find((x) => x.id === id);
                   if (p) setEdicion({ modo: "editar", persona: p });
                 }}
               />
             )}
-            {foco && (
+            {foco && panelAbierto && (
               <FichaPersona
                 persona={foco}
                 personas={personas}
                 onFoco={(id) => irA(id, { verArbol: false })}
+                onCerrar={() => setPanelAbierto(false)}
                 onEditar={() => setEdicion({ modo: "editar", persona: foco })}
                 onAgregar={(tipo) => setEdicion({ modo: "crear", vinculo: { tipo, base: foco } })}
                 puedeBorrar={permisos.puedeBorrar}

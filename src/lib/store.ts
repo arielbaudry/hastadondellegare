@@ -30,10 +30,14 @@ const UPSTASH_TOKEN =
 export type Driver = "fs" | "redis";
 export const driver: Driver = UPSTASH_URL && UPSTASH_TOKEN ? "redis" : "fs";
 
+export function puedeGuardar(): boolean {
+  return driver === "redis" || process.env.VERCEL !== "1";
+}
+
 export function estadoAlmacenamiento() {
   return {
     driver,
-    persistente: driver === "redis" || process.env.VERCEL !== "1",
+    persistente: puedeGuardar(),
     advertencia:
       driver === "fs" && process.env.VERCEL === "1"
         ? "Estás en Vercel sin Upstash configurado: el disco es efímero y los datos se pierden en cada deploy. Configurá UPSTASH_REDIS_REST_URL y UPSTASH_REDIS_REST_TOKEN."
@@ -52,7 +56,19 @@ async function leerFs(): Promise<Arbol> {
   }
 }
 
+/** Error de configuración, no de programa: se muestra tal cual al usuario. */
+export class SinPersistencia extends Error {}
+
 async function escribirFs(arbol: Arbol): Promise<void> {
+  // El disco de Vercel es de sólo lectura. Antes esto reventaba con un 500 sin
+  // cuerpo y el navegador mostraba "Unexpected end of JSON input", que no dice
+  // nada. Ahora falla con el motivo y con la instrucción para resolverlo.
+  if (process.env.VERCEL === "1") {
+    throw new SinPersistencia(
+      "Falta configurar Upstash Redis. En Vercel el disco es de sólo lectura, " +
+        "así que sin UPSTASH_REDIS_REST_URL y UPSTASH_REDIS_REST_TOKEN no se puede guardar nada.",
+    );
+  }
   await fs.mkdir(DIR_STORAGE, { recursive: true });
   // Copia de seguridad de la versión anterior antes de pisarla.
   await fs.copyFile(ARCHIVO, BACKUP).catch(() => {});

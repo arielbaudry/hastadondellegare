@@ -1,17 +1,19 @@
 # Hasta dónde llegaré
 
-Árbol genealógico familiar, colaborativo y sin login (por ahora). Cada persona
-tiene foto, nombres, apellidos, fechas, lugar de nacimiento y contacto opcional;
-los vínculos se navegan hacia arriba (ascendentes), hacia abajo (descendentes) y
-a los costados (laterales: pareja, hermanos, tíos, primos, sobrinos).
+Árbol genealógico familiar y colaborativo. Cada persona tiene fotos, nombres,
+apellidos, fechas, lugar de nacimiento y contacto opcional; los vínculos se
+navegan hacia arriba, hacia abajo y a los costados, y la ficha nombra cada
+parentesco ("tía abuela", "primo segundo") en vez de pedir que se cargue.
+
+Se entra por *magic link* al correo que ya figura en la ficha de cada uno.
 
 - **Producción:** https://hastadondellegare.vercel.app/
 - **Repositorio:** https://github.com/arielbaudry/hastadondellegare
-- **Local (preview de LAN):** http://192.168.1.71:8096
+- Preview local en la LAN del servidor, puerto 8096.
 
-Repo y Vercel están en la **cuenta personal de Ariel** (`ariel@baudry.com.ar`); el
-proyecto de Vercel se creó entrando con esa misma cuenta de GitHub. No es la
-cuenta de DAS Latam: esto es familiar, no de trabajo.
+> **Este repositorio es público.** Nada de lo que se versiona lleva datos de la
+> familia: `storage/` está en `.gitignore` y todas las credenciales y datos de
+> contacto viven en variables de entorno, vacías en `.env.example`.
 
 ---
 

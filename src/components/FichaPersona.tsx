@@ -27,6 +27,7 @@ interface Props {
   persona: Persona;
   personas: Persona[];
   onFoco: (id: string) => void;
+  onCerrar: () => void;
   onEditar: () => void;
   onAgregar: (tipo: TipoVinculo) => void;
   /** Sin la clave de administración nadie borra: se corrige, no se elimina. */
@@ -98,6 +99,7 @@ export default function FichaPersona({
   persona: p,
   personas,
   onFoco,
+  onCerrar,
   onEditar,
   onAgregar,
   puedeBorrar,
@@ -117,6 +119,9 @@ export default function FichaPersona({
   return (
     <aside className="panel">
       <div className="panel-cuerpo">
+        <button className="cerrar-panel" onClick={onCerrar} aria-label="Cerrar la ficha">
+          ✕
+        </button>
         <div className="ficha-cabecera">
           <Visor persona={p} />
           <div style={{ minWidth: 0 }}>
@@ -124,16 +129,13 @@ export default function FichaPersona({
             {p.apodo && (
               <div style={{ color: "var(--tinta-tenue)", fontSize: 13.5 }}>«{p.apodo}»</div>
             )}
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
-              <span className={`pastilla ${p.vivo ? "viva" : "difunta"}`}>
-                {p.vivo ? "Vive" : "Falleció"}
-              </span>
-              {años !== null && (
+            {años !== null && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
                 <span className="pastilla">
                   {años} años{p.vivo ? "" : " al fallecer"}
                 </span>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -150,10 +152,10 @@ export default function FichaPersona({
               <dd>{p.lugarNacimiento}</dd>
             </>
           )}
-          {p.fechaFallecimiento && (
+          {!p.vivo && (
             <>
               <dt>Falleció</dt>
-              <dd>{formatearFecha(p.fechaFallecimiento)}</dd>
+              <dd>{p.fechaFallecimiento ? formatearFecha(p.fechaFallecimiento) : "fecha no registrada"}</dd>
             </>
           )}
           {p.apellidoNacimiento && (
@@ -165,24 +167,31 @@ export default function FichaPersona({
         </dl>
 
         {hayContacto && (
-          <dl className="datos">
-            {contacto.map(([etiqueta, valor]) =>
-              valor ? (
-                <div key={etiqueta} style={{ display: "contents" }}>
-                  <dt>{etiqueta}</dt>
-                  <dd>
-                    {etiqueta === "Correo" ? (
-                      <a href={`mailto:${valor}`}>{valor}</a>
-                    ) : etiqueta === "Celular" ? (
-                      <a href={`tel:${valor.replace(/[^+\d]/g, "")}`}>{valor}</a>
-                    ) : (
-                      valor
-                    )}
-                  </dd>
-                </div>
-              ) : null,
+          <div className="contacto">
+            {/* Tener el dato y que sea un texto muerto no sirve de nada: lo que
+                uno quiere al abrir la ficha de un pariente es escribirle. */}
+            {p.email && (
+              <a className="btn chico" href={`mailto:${p.email}`}>
+                ✉️ Escribile a {p.nombres.split(" ")[0]}
+              </a>
             )}
-          </dl>
+            {p.celular && (
+              <>
+                <a className="btn chico" href={`tel:${p.celular.replace(/[^+\d]/g, "")}`}>
+                  📞 Llamá a {p.nombres.split(" ")[0]}
+                </a>
+                <a
+                  className="btn chico"
+                  href={`https://wa.me/${p.celular.replace(/[^\d]/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  WhatsApp
+                </a>
+              </>
+            )}
+            {p.direccion && <span className="contacto-dir">📍 {p.direccion}</span>}
+          </div>
         )}
 
         {p.notas && (

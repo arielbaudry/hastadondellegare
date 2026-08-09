@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { estadoAlmacenamiento, leerArbol, mutarArbol } from "@/lib/store";
+import { estadoAlmacenamiento, leerArbol, mutarArbol, puedeGuardar } from "@/lib/store";
 import { arbolDeEjemplo } from "@/lib/ejemplo";
 import { bloquearSiNoPuedeVer, permisosDe } from "@/lib/permisos";
 import { accesoRestringido, ADMIN_EMAIL, smtpConfigurado } from "@/lib/sesion";
@@ -8,6 +8,20 @@ export const dynamic = "force-dynamic";
 
 /** GET /api/arbol — todo el árbol. Es un documento chico: se manda entero. */
 export async function GET(req: Request) {
+  try {
+    return await responder(req);
+  } catch (err) {
+    // Pase lo que pase, sale JSON: un 500 con el cuerpo vacío hacía que el
+    // navegador mostrara "Unexpected end of JSON input" y nada más.
+    console.error("[arbol GET]", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "No se pudo leer el árbol." },
+      { status: 500, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+}
+
+async function responder(req: Request) {
   const permisos = permisosDe(req);
 
   // Sin sesión no se manda el árbol: sólo lo justo para pintar la pantalla de
@@ -54,8 +68,9 @@ export async function GET(req: Request) {
   }
 
   // Primer arranque: si está vacío, se siembra la familia de ejemplo para que
-  // el micrositio no abra en blanco. Se vacía desde Ajustes.
-  if (arbol.personas.length === 0 && arbol.rev === 0) {
+  // el micrositio no abra en blanco. Si el almacenamiento no puede escribir
+  // —Vercel sin Upstash— no se intenta: el sitio abre vacío y avisa por qué.
+  if (arbol.personas.length === 0 && arbol.rev === 0 && puedeGuardar()) {
     const ejemplo = arbolDeEjemplo();
     arbol = await mutarArbol((a) => {
       a.personas = ejemplo.personas;
