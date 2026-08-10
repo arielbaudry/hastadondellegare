@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contactos — árbol × CRM</title>
+<style>
+  :root {
+    --fondo: #f6f7f9; --papel: #fff; --tinta: #1c2024; --suave: #5b636c; --tenue: #8b939c;
+    --borde: #e3e6ea; --acento: #4f46e5; --ok: #15803d; --duda: #b45309;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--fondo); color: var(--tinta);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    position: sticky; top: 0; z-index: 5; background: var(--papel);
+    border-bottom: 1px solid var(--borde); padding: 14px 20px;
+    display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  }
+  h1 { font-size: 19px; margin: 0; }
+  .sub { color: var(--tenue); font-size: 13px; }
+  main { max-width: 980px; margin: 0 auto; padding: 20px; }
+  .prosa { text-align: justify; hyphens: auto; color: var(--suave); }
+  .aviso {
+    background: #fff7ed; border: 1px solid #fed7aa; color: #7c2d12;
+    padding: 12px 14px; border-radius: 12px; margin-bottom: 18px;
+  }
+  .persona {
+    background: var(--papel); border: 1px solid var(--borde); border-radius: 14px;
+    padding: 16px 18px; margin-bottom: 14px;
+  }
+  .persona.lista { border-color: #bbf7d0; }
+  .persona h2 { font-size: 17px; margin: 0 0 2px; }
+  .cand {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start;
+    padding: 9px 10px; border: 1px solid var(--borde); border-radius: 10px; margin-top: 8px;
+    cursor: pointer;
+  }
+  .cand:hover { background: #fafbfc; }
+  .cand.elegido { border-color: var(--acento); background: #f5f3ff; }
+  .cand .datos { color: var(--suave); font-size: 13px; }
+  .puntaje { font-variant-numeric: tabular-nums; font-size: 12.5px; color: var(--tenue); white-space: nowrap; }
+  .puntaje.alto { color: var(--ok); }
+  .puntaje.medio { color: var(--duda); }
+  table.campos { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  table.campos th {
+    text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--tenue); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--borde);
+  }
+  table.campos td { padding: 6px 8px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+  table.campos label { display: block; padding: 2px 0; cursor: pointer; }
+  .vacio { color: var(--tenue); font-style: italic; }
+  button {
+    font: inherit; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--borde);
+    background: var(--papel); cursor: pointer;
+  }
+  button.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  button:disabled { opacity: .5; cursor: default; }
+  .filtros { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  #estado { padding: 10px 0; color: var(--suave); }
+  .marca { font-size: 12.5px; color: var(--tenue); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Contactos</h1>
+    <div class="sub">Cruce del árbol con el CRM del servidor · página temporal</div>
+  </div>
+  <div class="filtros">
+    <label class="marca"><input type="checkbox" id="solo-pendientes"> sólo pendientes</label>
+    <button id="recalcular">Recalcular</button>
+    <button id="aplicar" class="primario">Aplicar al árbol</button>
+  </div>
+</header>
+
+<main>
+  <div class="aviso">
+    <strong>Nada se toca hasta que toques «Aplicar al árbol».</strong> El CRM está lleno de
+    homónimos —hay tres «Maria Ines Rodriguez» en el padrón de IOMA—, así que ningún cruce se da
+    por bueno solo. Confirmá vos cuál es la misma persona y qué dato vale.
+  </div>
+  <p class="prosa">
+    Cada tarjeta es alguien del árbol. Debajo, los contactos del CRM que se le parecen, del más
+    al menos probable. Al elegir uno aparece la tabla de datos: a la izquierda lo que hoy tiene
+    la ficha, a la derecha lo que aporta el CRM. Elegí con qué te quedás.
+  </p>
+  <div id="estado">Cargando el cruce…</div>
+  <div id="lista"></div>
+</main>
+
+<script>
+const CAMPOS = [["celular", "Celular"], ["email", "Correo"], ["direccion", "Dirección"]];
+let datos = { personas: [], decisiones: {} };
+
+const guardar = () =>
+  fetch("/api/decisiones", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos.decisiones),
+  });
+
+function decision(id) {
+  if (!datos.decisiones[id]) datos.decisiones[id] = { contactos: [], campos: {} };
+  return datos.decisiones[id];
+}
+
+/** Todos los valores distintos que ofrecen los contactos confirmados. */
+function opciones(p, campo) {
+  const d = decision(p.id);
+  const vistos = new Set();
+  const salida = [];
+  for (const c of p.candidatos) {
+    if (!d.contactos.includes(c.id)) continue;
+    for (const v of c[campo] || []) {
+      const k = v.trim();
+      if (k && !vistos.has(k)) { vistos.add(k); salida.push(k); }
+    }
+  }
+  return salida.filter((v) => v !== (p.actual[campo] || "").trim());
+}
+
+function pintar() {
+  const soloPend = document.getElementById("solo-pendientes").checked;
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  for (const p of datos.personas) {
+    const d = decision(p.id);
+    const resuelta = d.contactos.length > 0;
+    if (soloPend && resuelta) continue;
+
+    const caja = document.createElement("div");
+    caja.className = "persona" + (resuelta ? " lista" : "");
+    const hoy = CAMPOS.map(([k, t]) => (p.actual[k] ? `${t.toLowerCase()}: ${p.actual[k]}` : null))
+      .filter(Boolean).join(" · ") || "sin datos de contacto cargados";
+    caja.innerHTML = `<h2>${p.nombre}</h2><div class="sub">${hoy}</div>`;
+
+    for (const c of p.candidatos) {
+      const el = document.createElement("div");
+      const elegido = d.contactos.includes(c.id);
+      el.className = "cand" + (elegido ? " elegido" : "");
+      const nivel = c.puntaje >= 0.95 ? "alto" : c.puntaje >= 0.75 ? "medio" : "";
+      const datosTxt = [
+        (c.celular || []).join(" / "),
+        (c.email || []).join(" / "),
+        (c.direccion || []).join(" · "),
+      ].filter(Boolean).join(" — ") || "sin datos";
+      el.innerHTML =
+        `<input type="checkbox" ${elegido ? "checked" : ""}>` +
+        `<div><strong>${c.nombre}</strong><div class="datos">${datosTxt}</div>` +
+        `<div class="marca">${c.fuente} · ${c.motivo}</div></div>` +
+        `<span class="puntaje ${nivel}">${c.puntaje.toFixed(2)}</span>`;
+      el.onclick = (ev) => {
+        if (ev.target.tagName === "INPUT") ev.stopPropagation();
+        const i = d.contactos.indexOf(c.id);
+        if (i >= 0) d.contactos.splice(i, 1); else d.contactos.push(c.id);
+        guardar(); pintar();
+      };
+      caja.appendChild(el);
+    }
+
+    if (resuelta) {
+      const t = document.createElement("table");
+      t.className = "campos";
+      t.innerHTML = "<tr><th>Dato</th><th>Hoy en la ficha</th><th>Del CRM</th></tr>";
+      for (const [campo, titulo] of CAMPOS) {
+        const actual = (p.actual[campo] || "").trim();
+        const ops = opciones(p, campo);
+        const fila = document.createElement("tr");
+        const elegido = d.campos[campo];
+        const nombre = `${p.id}-${campo}`;
+        const radio = (valor, texto, marcado) =>
+          `<label><input type="radio" name="${nombre}" value="${encodeURIComponent(valor)}" ${
+            marcado ? "checked" : ""
+          }> ${texto}</label>`;
+        fila.innerHTML =
+          `<td>${titulo}</td>` +
+          `<td>${radio("", actual || '<span class="vacio">vacío</span>', !elegido)}</td>` +
+          `<td>${
+            ops.length
+              ? ops.map((v) => radio(v, v, elegido === v)).join("")
+              : '<span class="vacio">nada nuevo</span>'
+          }</td>`;
+        fila.querySelectorAll("input").forEach((i) => {
+          i.onchange = () => {
+            const v = decodeURIComponent(i.value);
+            if (v) d.campos[campo] = v; else delete d.campos[campo];
+            guardar(); pintarResumen();
+          };
+        });
+        t.appendChild(fila);
+      }
+      caja.appendChild(t);
+    }
+    lista.appendChild(caja);
+  }
+  pintarResumen();
+}
+
+function pendientesDeAplicar() {
+  return datos.personas
+    .map((p) => ({ id: p.id, nombre: p.nombre, campos: (datos.decisiones[p.id] || {}).campos || {} }))
+    .filter((x) => Object.keys(x.campos).length > 0);
+}
+
+function pintarResumen() {
+  const listos = Object.values(datos.decisiones).filter((d) => d.contactos.length).length;
+  const cambios = pendientesDeAplicar();
+  document.getElementById("estado").textContent =
+    `${datos.personas.length} personas del árbol con algún candidato · ` +
+    `${listos} confirmadas · ${cambios.length} con datos nuevos para aplicar`;
+  document.getElementById("aplicar").disabled = cambios.length === 0;
+}
+
+async function cargar() {
+  const r = await fetch("/api/cotejo");
+  datos = await r.json();
+  pintar();
+}
+
+document.getElementById("solo-pendientes").onchange = pintar;
+
+document.getElementById("recalcular").onclick = async (e) => {
+  e.target.disabled = true;
+  document.getElementById("estado").textContent = "Recalculando contra el CRM…";
+  const r = await fetch("/api/recalcular", { method: "POST" });
+  datos.personas = (await r.json()).personas;
+  e.target.disabled = false;
+  pintar();
+};
+
+document.getElementById("aplicar").onclick = async (e) => {
+  const cambios = pendientesDeAplicar();
+  const detalle = cambios
+    .map((c) => `${c.nombre}: ${Object.entries(c.campos).map(([k, v]) => `${k}=${v}`).join(", ")}`)
+    .join("\n");
+  if (!confirm(`Se van a guardar en el árbol publicado:\n\n${detalle}\n\n¿Aplico?`)) return;
+  e.target.disabled = true;
+  document.getElementById("estado").textContent = "Guardando en el árbol…";
+  const r = await fetch("/api/aplicar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cambios }),
+  });
+  const { resultados } = await r.json();
+  const fallaron = resultados.filter((x) => !x.ok);
+  alert(
+    fallaron.length
+      ? `Se guardaron ${resultados.length - fallaron.length}. Fallaron ${fallaron.length}:\n` +
+        fallaron.map((f) => f.error).join("\n")
+      : `Listo: ${resultados.length} fichas actualizadas en el árbol.`,
+  );
+  // Lo aplicado deja de estar pendiente, pero la confirmación de identidad queda.
+  for (const x of resultados.filter((y) => y.ok)) datos.decisiones[x.id].campos = {};
+  await guardar();
+  const c = await (await fetch("/api/recalcular", { method: "POST" })).json();
+  datos.personas = c.personas;
+  e.target.disabled = false;
+  pintar();
+};
+
+cargar();
+</script>
+</body>
+</html>

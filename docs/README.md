@@ -20,3 +20,10 @@
   se sincroniza solo cada 10 minutos y guarda un respaldo por día.
 - Los datos son **un archivo JSON** en un repositorio privado de GitHub. No hay
   base de datos.
+
+## Herramientas aparte
+
+- [`herramientas/`](../herramientas/README.md) — **Contactos**, página temporal
+  que cruza el árbol con el CRM del servidor (Padrón, 629 mil contactos) para
+  completar celulares, correos y direcciones que ya teníamos cargados en otro
+  lado. Corre sólo en el servidor, en `:8098`, porque el CRM es una base local.
