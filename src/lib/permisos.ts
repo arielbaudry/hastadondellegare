@@ -17,6 +17,15 @@ import { accesoRestringido, sesionDe, type Sesion } from "./sesion";
  * borrar por accidente.
  */
 
+/**
+ * Esta instancia es una copia de sólo lectura del sitio publicado. El árbol que
+ * vale es el que carga la familia; acá sólo se mira y se guardan respaldos.
+ * Editar en el espejo divergiría en silencio hasta que la próxima sincronización
+ * se llevara el trabajo puesto.
+ */
+export const ES_ESPEJO = process.env.ES_ESPEJO === "1";
+export const SITIO_PRINCIPAL = process.env.SITIO_PRINCIPAL ?? "";
+
 export const CLAVE_ADMIN = process.env.ADMIN_CLAVE ?? "";
 export const CABECERA_CLAVE = "x-clave-admin";
 
@@ -48,6 +57,10 @@ export interface Permisos {
 export function permisosDe(req: Request): Permisos {
   const restringido = accesoRestringido();
   const sesion = restringido ? sesionDe(req) : null;
+
+  if (ES_ESPEJO) {
+    return { puedeVer: true, puedeEditar: false, puedeBorrar: false, restringido, sesion: null };
+  }
 
   if (!restringido) {
     return {
@@ -81,6 +94,12 @@ export function bloquearSiNoPuedeVer(req: Request): NextResponse | null {
 
 /** Para sumar o corregir. */
 export function bloquearSiNoPuedeEditar(req: Request): NextResponse | null {
+  if (ES_ESPEJO) {
+    return rechazar(
+      `Esta es una copia de sólo lectura. Cargá y corregí en ${SITIO_PRINCIPAL || "el sitio publicado"}.`,
+      403,
+    );
+  }
   return permisosDe(req).puedeEditar
     ? null
     : rechazar("Pedí tu enlace de acceso para cargar o corregir.", 401);

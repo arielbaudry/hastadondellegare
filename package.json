@@ -9,7 +9,8 @@
     "start": "next start -p 8096",
     "seed": "node scripts/seed.mjs",
     "reset": "node scripts/seed.mjs --vaciar",
-    "publicar": "node scripts/publicar.mjs"
+    "publicar": "node scripts/publicar.mjs",
+    "respaldar": "node scripts/respaldar.mjs"
   },
   "dependencies": {
     "@vercel/blob": "^2.7.0",

@@ -63,6 +63,7 @@ export default function App() {
   });
   const [sesion, setSesion] = useState<Sesion | null>(null);
   const [contacto, setContacto] = useState({ email: "ariel@baudry.com.ar", telefono: "" });
+  const [espejo, setEspejo] = useState<{ principal: string } | null>(null);
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
@@ -119,6 +120,7 @@ export default function App() {
         setRev(datos.rev ?? null);
         setSesion(datos.sesion ?? null);
         if (datos.contacto) setContacto(datos.contacto);
+        setEspejo(datos.espejo ?? null);
 
         const guardado = leerFocoGuardado();
         const valido = guardado && datos.personas.some((p) => p.id === guardado);
@@ -137,7 +139,7 @@ export default function App() {
    * está escribiendo.
    */
   useEffect(() => {
-    if (!autor || !permisos.puedeVer) return;
+    if (!autor || !permisos.puedeVer || espejo) return;
     let vivo = true;
 
     const tic = async () => {
@@ -167,7 +169,7 @@ export default function App() {
       vivo = false;
       window.clearInterval(id);
     };
-  }, [autor, permisos.puedeVer]);
+  }, [autor, permisos.puedeVer, espejo]);
 
   const foco = useMemo(() => personas.find((p) => p.id === focoId) ?? null, [personas, focoId]);
 
@@ -379,7 +381,7 @@ export default function App() {
   }
 
   // El nombre se pide una sola vez, antes de dejar tocar nada.
-  if (!cargando && !errorCarga && permisos.puedeVer && !autor) {
+  if (!cargando && !errorCarga && permisos.puedeVer && !autor && !espejo) {
     return (
       <Bienvenida
         personas={personas}
@@ -515,6 +517,20 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {espejo && (
+        <div className="aviso rojo">
+          <span aria-hidden="true">👁️</span>
+          <p style={{ margin: 0 }}>
+            <strong>Copia de sólo lectura.</strong> El árbol que vale es el que carga la
+            familia:{" "}
+            <a href={espejo.principal} target="_blank" rel="noreferrer">
+              {espejo.principal.replace(/^https?:\/\//, "")}
+            </a>
+            . Acá no se puede editar — esta copia se actualiza sola desde allá.
+          </p>
+        </div>
+      )}
 
       {almacenamiento?.advertencia && (
         <div className="aviso rojo">

@@ -26,6 +26,7 @@ export interface RespuestaArbol extends Arbol {
   permisos: Permisos;
   sesion: Sesion | null;
   contacto: { email: string; telefono: string };
+  espejo: { principal: string } | null;
 }
 
 const CLAVE_ADMIN = "hdll:clave";

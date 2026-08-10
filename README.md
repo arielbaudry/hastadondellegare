@@ -7,9 +7,15 @@ parentesco ("tía abuela", "primo segundo") en vez de pedir que se cargue.
 
 Se entra por *magic link* al correo que ya figura en la ficha de cada uno.
 
-- **Producción:** https://hastadondellegare.vercel.app/
+> **Documentación completa en [`docs/`](docs/).** Y en el tablero del servidor,
+> con estado en vivo: https://192.168.1.71/arbol
+
+- **Producción (el árbol que vale):** https://hastadondellegare.vercel.app/
 - **Repositorio:** https://github.com/arielbaudry/hastadondellegare
-- Preview local en la LAN del servidor, puerto 8096.
+- **Espejo local de sólo lectura** en la LAN del servidor, puerto 8096. Se
+  sincroniza solo cada 10 minutos y guarda un respaldo por día. **No se edita
+  ahí**: la familia carga en producción, y editar en los dos lados haría
+  divergir los árboles en silencio.
 
 > **Este repositorio es público.** Nada de lo que se versiona lleva datos de la
 > familia: `storage/` está en `.gitignore` y todas las credenciales y datos de

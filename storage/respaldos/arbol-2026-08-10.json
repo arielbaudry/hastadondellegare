@@ -1,0 +1,1411 @@
+{
+  "rev": 39,
+  "bajado": "2026-08-10T01:51:37.359Z",
+  "personas": [
+    {
+      "id": "a269b7ed-e545-4791-9a2f-fa5b8de41481",
+      "nombres": "Ariel Osvaldo",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [
+        "/api/fotos/a9f21e2c-c3de-4279-9b28-9d222ad62cfa.jpg"
+      ],
+      "fechaNacimiento": "1975-11-08",
+      "lugarNacimiento": "Quilmes",
+      "vivo": true,
+      "celular": "+5491139009550",
+      "email": "ariel@baudry.com.ar",
+      "direccion": "Calle 129 N7304, Club El Carmen",
+      "padres": [
+        "60eb78cf-5979-4494-a188-e5f9569d7daf",
+        "67cbcf49-b8ea-4108-acd3-0abcec52face"
+      ],
+      "parejas": [
+        {
+          "personaId": "ce7b9315-6610-49a7-a7c1-5245995cb9fe",
+          "tipo": "casado",
+          "desde": "2005-11-23"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T14:32:56.159Z",
+      "actualizadoEn": "2026-08-10T00:02:45.571Z"
+    },
+    {
+      "id": "ce7b9315-6610-49a7-a7c1-5245995cb9fe",
+      "nombres": "Maria Cecilia",
+      "apellidos": "Vidal",
+      "genero": "F",
+      "fotos": [
+        "/api/fotos/5f1dd385-3074-4927-b3d2-699aadfa36be.jpg"
+      ],
+      "fechaNacimiento": "1970-06-21",
+      "lugarNacimiento": "CABA",
+      "vivo": true,
+      "celular": "+5491165517385",
+      "email": "vidalcecilia@hotmail.com",
+      "direccion": "Calle 129 N7304, Club El Carmen",
+      "padres": [
+        "02cf923a-3ba2-4185-badd-952e301ee15c",
+        "a80bd84b-84d1-4bc1-825b-c72f222423f2"
+      ],
+      "parejas": [
+        {
+          "personaId": "a269b7ed-e545-4791-9a2f-fa5b8de41481",
+          "tipo": "casado",
+          "desde": "2005-11-23"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T14:34:44.300Z",
+      "actualizadoEn": "2026-08-10T00:02:45.580Z"
+    },
+    {
+      "id": "69010d6b-32d0-4bb1-bf62-37d6b80d2847",
+      "nombres": "Florencia Ailem",
+      "apellidos": "Baudry",
+      "genero": "F",
+      "fotos": [
+        "/api/fotos/e9dd2eef-70e6-47f5-b21b-e5932a56d6ff.jpg"
+      ],
+      "fechaNacimiento": "1994-03-29",
+      "lugarNacimiento": "Santa Teresita",
+      "vivo": true,
+      "padres": [
+        "a269b7ed-e545-4791-9a2f-fa5b8de41481",
+        "e89f36ed-3691-4c31-ad33-70f26e9b40f3"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T14:37:58.769Z",
+      "actualizadoEn": "2026-08-10T00:02:45.586Z"
+    },
+    {
+      "id": "60eb78cf-5979-4494-a188-e5f9569d7daf",
+      "nombres": "Hector Eduardo",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [
+        "/api/fotos/47f6436d-38c9-48b2-9198-65cec3eb3d58.jpg"
+      ],
+      "fechaNacimiento": "1946-01-02",
+      "lugarNacimiento": "Bernal",
+      "vivo": false,
+      "fechaFallecimiento": "2023-02-27",
+      "padres": [
+        "376ab17f-3ef8-4c35-a1c1-c754781483f2",
+        "9b3fdd8d-c527-4460-9f19-2a78cd040554"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T14:40:47.202Z",
+      "actualizadoEn": "2026-08-10T01:11:20.553Z"
+    },
+    {
+      "id": "67cbcf49-b8ea-4108-acd3-0abcec52face",
+      "nombres": "Lidia",
+      "apellidos": "Karme",
+      "genero": "F",
+      "fotos": [
+        "/api/fotos/698d61e7-e1c1-465f-b386-e77a73d605da.jpg"
+      ],
+      "fechaNacimiento": "1951-06-13",
+      "lugarNacimiento": "CABA",
+      "vivo": false,
+      "fechaFallecimiento": "2009-09-02",
+      "padres": [
+        "dbf65345-8328-41d0-83cd-75ed8a9fbec0",
+        "703bda7e-9bd8-4690-9bd5-b28922eb0b47"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T14:41:27.874Z",
+      "actualizadoEn": "2026-08-10T01:50:58.045Z"
+    },
+    {
+      "id": "9bbb6c9d-3b7a-4da3-8227-ca61484f480d",
+      "nombres": "Maria Clara",
+      "apellidos": "Baudry",
+      "genero": "F",
+      "fotos": [
+        "/api/fotos/f96f3aac-95d6-43c4-8753-94a4f887ea0a.jpg"
+      ],
+      "fechaNacimiento": "2009-07-30",
+      "lugarNacimiento": "CABA",
+      "vivo": true,
+      "padres": [
+        "a269b7ed-e545-4791-9a2f-fa5b8de41481",
+        "ce7b9315-6610-49a7-a7c1-5245995cb9fe"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T14:42:04.315Z",
+      "actualizadoEn": "2026-08-10T00:02:45.605Z"
+    },
+    {
+      "id": "cee90dee-efcb-47e3-b8b4-2e35baab4cb9",
+      "nombres": "Leonardo Ezequiel",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1983-07-21",
+      "lugarNacimiento": "Quilmes",
+      "vivo": true,
+      "celular": "+5491169370722",
+      "email": "leonardo@baudry.com.ar",
+      "padres": [
+        "60eb78cf-5979-4494-a188-e5f9569d7daf",
+        "67cbcf49-b8ea-4108-acd3-0abcec52face"
+      ],
+      "parejas": [
+        {
+          "personaId": "10c8a488-8efa-426e-8aaa-7c5c96fcc268",
+          "tipo": "casado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T14:52:38.262Z",
+      "actualizadoEn": "2026-08-10T00:02:45.610Z"
+    },
+    {
+      "id": "90506ad2-333c-4ed9-bf91-1db5742a50db",
+      "nombres": "Gabriela Fabiana",
+      "apellidos": "Baudry",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1971-02-21",
+      "lugarNacimiento": "CABA",
+      "vivo": true,
+      "celular": "+5492257539661",
+      "email": "gabriela.lalucila@gmail.com",
+      "padres": [
+        "60eb78cf-5979-4494-a188-e5f9569d7daf",
+        "67cbcf49-b8ea-4108-acd3-0abcec52face"
+      ],
+      "parejas": [
+        {
+          "personaId": "49770d9f-2f0d-473f-94bc-e92a6651b207",
+          "tipo": "casado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T14:56:27.447Z",
+      "actualizadoEn": "2026-08-10T00:02:45.617Z"
+    },
+    {
+      "id": "376ab17f-3ef8-4c35-a1c1-c754781483f2",
+      "nombres": "Bautista",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1908",
+      "vivo": false,
+      "padres": [],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T15:00:21.192Z",
+      "actualizadoEn": "2026-08-10T00:02:45.622Z"
+    },
+    {
+      "id": "9b3fdd8d-c527-4460-9f19-2a78cd040554",
+      "nombres": "Maria",
+      "apellidos": "Betelu",
+      "genero": "F",
+      "fotos": [
+        "/api/fotos/1ea714b9-a1ac-420d-abc4-952e411e383e.jpg"
+      ],
+      "fechaNacimiento": "1916",
+      "vivo": false,
+      "padres": [],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T15:00:55.425Z",
+      "actualizadoEn": "2026-08-10T00:02:45.627Z"
+    },
+    {
+      "id": "dbf65345-8328-41d0-83cd-75ed8a9fbec0",
+      "nombres": "Arturo",
+      "apellidos": "Karme",
+      "genero": "M",
+      "fotos": [
+        "/api/fotos/12d408a7-a5a8-4263-b145-367bfeb31f31.jpg"
+      ],
+      "fechaNacimiento": "1925-05-01",
+      "lugarNacimiento": "Torino, Italia",
+      "vivo": false,
+      "fechaFallecimiento": "2005-12-28",
+      "notas": "Lugar de nacimiento segun el acta de matrimonio: Piotrkow, Polonia\n\nLa sucecion esta en https://mev.scba.gov.ar/procesales.asp?pidJuzgado=GAM596&nidCausa=165539&MT=SI",
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "703bda7e-9bd8-4690-9bd5-b28922eb0b47",
+          "tipo": "casado",
+          "desde": "1946-06-09"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T15:02:45.424Z",
+      "actualizadoEn": "2026-08-10T00:02:45.633Z"
+    },
+    {
+      "id": "703bda7e-9bd8-4690-9bd5-b28922eb0b47",
+      "nombres": "Antonia",
+      "apellidos": "Labianca",
+      "genero": "F",
+      "fotos": [
+        "/api/fotos/a9ec167d-b7c4-47f0-ac86-8e4f6620f595.jpg"
+      ],
+      "fechaNacimiento": "1926",
+      "vivo": false,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "dbf65345-8328-41d0-83cd-75ed8a9fbec0",
+          "tipo": "casado",
+          "desde": "1946-06-09"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T15:03:06.600Z",
+      "actualizadoEn": "2026-08-10T01:07:10.902Z"
+    },
+    {
+      "id": "1050fc50-62ec-4f27-8119-1fbc7e6a9ae3",
+      "nombres": "Diana",
+      "apellidos": "Karme",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1959-03-10",
+      "lugarNacimiento": "Quilmes",
+      "vivo": true,
+      "padres": [
+        "dbf65345-8328-41d0-83cd-75ed8a9fbec0",
+        "703bda7e-9bd8-4690-9bd5-b28922eb0b47"
+      ],
+      "parejas": [
+        {
+          "personaId": "ca3bd27b-9f3c-44c4-9a74-b217e0c57758",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T17:59:08.681Z",
+      "actualizadoEn": "2026-08-10T00:02:45.643Z"
+    },
+    {
+      "id": "05574b71-7783-42ed-91f4-73113773d966",
+      "nombres": "Alejandro",
+      "apellidos": "Karme",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1947-04-10",
+      "lugarNacimiento": "Reggio Emilia, Italia",
+      "vivo": false,
+      "padres": [
+        "dbf65345-8328-41d0-83cd-75ed8a9fbec0",
+        "703bda7e-9bd8-4690-9bd5-b28922eb0b47"
+      ],
+      "parejas": [
+        {
+          "personaId": "0960a788-219c-4286-b1f4-8cfc6ac1132f",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T17:59:43.078Z",
+      "actualizadoEn": "2026-08-10T00:02:45.648Z"
+    },
+    {
+      "id": "49770d9f-2f0d-473f-94bc-e92a6651b207",
+      "nombres": "Carmelo Andres",
+      "apellidos": "Caliendo",
+      "genero": "M",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "90506ad2-333c-4ed9-bf91-1db5742a50db",
+          "tipo": "casado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:01:43.889Z",
+      "actualizadoEn": "2026-08-10T00:02:45.653Z"
+    },
+    {
+      "id": "0e9f8d72-2be4-4c6b-87f6-d7a3c9a5ef6c",
+      "nombres": "Mauro Andres",
+      "apellidos": "Caliendo",
+      "genero": "M",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "49770d9f-2f0d-473f-94bc-e92a6651b207",
+        "90506ad2-333c-4ed9-bf91-1db5742a50db"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:01:57.051Z",
+      "actualizadoEn": "2026-08-10T00:02:45.657Z"
+    },
+    {
+      "id": "b93b940e-b387-4255-b843-e476188e73fc",
+      "nombres": "Fiorella",
+      "apellidos": "Caliendo",
+      "genero": "F",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "49770d9f-2f0d-473f-94bc-e92a6651b207",
+        "90506ad2-333c-4ed9-bf91-1db5742a50db"
+      ],
+      "parejas": [
+        {
+          "personaId": "193aa84a-2d0a-4fb2-bb7f-91c7bf0039e6",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:02:10.406Z",
+      "actualizadoEn": "2026-08-10T00:02:45.662Z"
+    },
+    {
+      "id": "849ddeb1-3e13-4324-9530-5f796373977b",
+      "nombres": "Santiago",
+      "apellidos": "Caliendo",
+      "genero": "M",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "49770d9f-2f0d-473f-94bc-e92a6651b207",
+        "90506ad2-333c-4ed9-bf91-1db5742a50db"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:02:22.257Z",
+      "actualizadoEn": "2026-08-10T00:02:45.667Z"
+    },
+    {
+      "id": "10c8a488-8efa-426e-8aaa-7c5c96fcc268",
+      "nombres": "Ines",
+      "apellidos": "Rodriguez",
+      "genero": "F",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "cee90dee-efcb-47e3-b8b4-2e35baab4cb9",
+          "tipo": "casado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:05:36.543Z",
+      "actualizadoEn": "2026-08-10T00:02:45.671Z"
+    },
+    {
+      "id": "a53dde8d-8117-4594-98a3-35cf018ba4e2",
+      "nombres": "Maia",
+      "apellidos": "Baudry",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "2003",
+      "vivo": true,
+      "padres": [
+        "cee90dee-efcb-47e3-b8b4-2e35baab4cb9"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:06:29.289Z",
+      "actualizadoEn": "2026-08-10T00:02:45.677Z"
+    },
+    {
+      "id": "014cb164-317c-4550-bfe0-2130c19fac34",
+      "nombres": "Nina",
+      "apellidos": "Baudry",
+      "genero": "F",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "cee90dee-efcb-47e3-b8b4-2e35baab4cb9",
+        "10c8a488-8efa-426e-8aaa-7c5c96fcc268"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:07:10.058Z",
+      "actualizadoEn": "2026-08-10T00:02:45.681Z"
+    },
+    {
+      "id": "6e918135-2fdb-4c1b-ad1e-61a7e8c6177e",
+      "nombres": "Astor",
+      "apellidos": "Graziani",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "2019",
+      "vivo": true,
+      "padres": [
+        "69010d6b-32d0-4bb1-bf62-37d6b80d2847",
+        "67e1e436-2761-41a6-912b-d8b5f84be7fa"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:10:46.160Z",
+      "actualizadoEn": "2026-08-10T00:02:45.686Z"
+    },
+    {
+      "id": "67e1e436-2761-41a6-912b-d8b5f84be7fa",
+      "nombres": "Celso",
+      "apellidos": "Graziani",
+      "genero": "M",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:12:03.401Z",
+      "actualizadoEn": "2026-08-10T00:02:45.691Z"
+    },
+    {
+      "id": "a45a53af-1312-434c-9171-ccc87521a0b9",
+      "nombres": "Lucio",
+      "apellidos": "Graziani",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "2021",
+      "vivo": true,
+      "padres": [
+        "69010d6b-32d0-4bb1-bf62-37d6b80d2847",
+        "67e1e436-2761-41a6-912b-d8b5f84be7fa"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:12:30.815Z",
+      "actualizadoEn": "2026-08-10T00:02:45.695Z"
+    },
+    {
+      "id": "b2465712-87b5-4c76-a6f1-7068f437648a",
+      "nombres": "Osvaldo",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1940",
+      "vivo": false,
+      "padres": [
+        "376ab17f-3ef8-4c35-a1c1-c754781483f2",
+        "9b3fdd8d-c527-4460-9f19-2a78cd040554"
+      ],
+      "parejas": [
+        {
+          "personaId": "dddab6eb-9cea-4881-b394-99e088ffd0c4",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:13:08.289Z",
+      "actualizadoEn": "2026-08-10T00:02:45.700Z"
+    },
+    {
+      "id": "679f794e-344c-43cd-a99e-9855e3b84cdb",
+      "nombres": "Hugo",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1942",
+      "vivo": false,
+      "padres": [
+        "376ab17f-3ef8-4c35-a1c1-c754781483f2",
+        "9b3fdd8d-c527-4460-9f19-2a78cd040554"
+      ],
+      "parejas": [
+        {
+          "personaId": "76c84757-db79-4ed7-b984-a29c3170ebd1",
+          "tipo": "pareja"
+        },
+        {
+          "personaId": "0d9e824b-ac3d-4ecc-b853-c059f95127cd",
+          "tipo": "separado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:16:19.004Z",
+      "actualizadoEn": "2026-08-10T00:02:45.705Z"
+    },
+    {
+      "id": "1e6fc9d3-ffe2-4eda-8dbc-119f1a405fb9",
+      "nombres": "Nolberto",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1944",
+      "vivo": false,
+      "padres": [
+        "376ab17f-3ef8-4c35-a1c1-c754781483f2",
+        "9b3fdd8d-c527-4460-9f19-2a78cd040554"
+      ],
+      "parejas": [
+        {
+          "personaId": "cc14d515-2676-409d-ac08-778d3d89f65a",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:16:40.245Z",
+      "actualizadoEn": "2026-08-10T00:02:45.710Z"
+    },
+    {
+      "id": "c1d6c568-f8ca-47e8-85bb-62d3bb6168da",
+      "nombres": "Miguel Angel",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "vivo": false,
+      "padres": [
+        "b2465712-87b5-4c76-a6f1-7068f437648a"
+      ],
+      "parejas": [
+        {
+          "personaId": "cd642e5f-0402-4f2c-aff5-fc6390c149a5",
+          "tipo": "separado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:19:38.108Z",
+      "actualizadoEn": "2026-08-10T00:02:45.715Z"
+    },
+    {
+      "id": "13578242-b33b-474c-9bf9-b9cef6b512fd",
+      "nombres": "Walter",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1966",
+      "vivo": true,
+      "padres": [
+        "679f794e-344c-43cd-a99e-9855e3b84cdb",
+        "0d9e824b-ac3d-4ecc-b853-c059f95127cd"
+      ],
+      "parejas": [
+        {
+          "personaId": "18cf5f2e-53ec-454d-9e82-c9a23eacaaf7",
+          "tipo": "separado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:20:12.086Z",
+      "actualizadoEn": "2026-08-10T00:02:45.720Z"
+    },
+    {
+      "id": "22603b67-117e-4fe4-84fe-efd8d123968f",
+      "nombres": "Karina",
+      "apellidos": "Baudry",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1970",
+      "vivo": true,
+      "padres": [
+        "679f794e-344c-43cd-a99e-9855e3b84cdb",
+        "76c84757-db79-4ed7-b984-a29c3170ebd1"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:20:30.807Z",
+      "actualizadoEn": "2026-08-10T00:02:45.724Z"
+    },
+    {
+      "id": "7357b603-f70b-41da-a31d-0fe23f1c2781",
+      "nombres": "Hernan",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1975",
+      "vivo": true,
+      "padres": [
+        "679f794e-344c-43cd-a99e-9855e3b84cdb",
+        "76c84757-db79-4ed7-b984-a29c3170ebd1"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:20:49.498Z",
+      "actualizadoEn": "2026-08-10T00:02:45.729Z"
+    },
+    {
+      "id": "f9779362-6f64-4a1f-bc45-96250b432af9",
+      "nombres": "Gabriel",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1966",
+      "vivo": true,
+      "padres": [
+        "1e6fc9d3-ffe2-4eda-8dbc-119f1a405fb9",
+        "cc14d515-2676-409d-ac08-778d3d89f65a"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:21:29.333Z",
+      "actualizadoEn": "2026-08-10T00:02:45.735Z"
+    },
+    {
+      "id": "748dcda0-22f0-4779-bb9c-24b6e974604c",
+      "nombres": "Pablo",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1968",
+      "vivo": true,
+      "padres": [
+        "1e6fc9d3-ffe2-4eda-8dbc-119f1a405fb9",
+        "cc14d515-2676-409d-ac08-778d3d89f65a"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:21:48.219Z",
+      "actualizadoEn": "2026-08-10T00:02:45.739Z"
+    },
+    {
+      "id": "019b3068-9323-4cd0-ac10-79f7e079d348",
+      "nombres": "Maria Berenice",
+      "apellidos": "Baudry",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1976",
+      "vivo": true,
+      "padres": [
+        "1e6fc9d3-ffe2-4eda-8dbc-119f1a405fb9",
+        "cc14d515-2676-409d-ac08-778d3d89f65a"
+      ],
+      "parejas": [
+        {
+          "personaId": "f317d99a-cea8-484f-ab05-78f3bf33037e",
+          "tipo": "casado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:22:04.302Z",
+      "actualizadoEn": "2026-08-10T00:02:45.744Z"
+    },
+    {
+      "id": "24d1f0eb-a418-488b-a423-ec97530122bd",
+      "nombres": "Juan Sebastian",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1980",
+      "vivo": true,
+      "padres": [
+        "1e6fc9d3-ffe2-4eda-8dbc-119f1a405fb9",
+        "cc14d515-2676-409d-ac08-778d3d89f65a"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:22:23.420Z",
+      "actualizadoEn": "2026-08-10T00:02:45.749Z"
+    },
+    {
+      "id": "ba1c1189-64b1-4399-8102-72ac08b749eb",
+      "nombres": "Lorenzo",
+      "apellidos": "Pirillo",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "2019",
+      "vivo": true,
+      "padres": [
+        "b93b940e-b387-4255-b843-e476188e73fc",
+        "193aa84a-2d0a-4fb2-bb7f-91c7bf0039e6"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:25:48.824Z",
+      "actualizadoEn": "2026-08-10T00:02:45.754Z"
+    },
+    {
+      "id": "193aa84a-2d0a-4fb2-bb7f-91c7bf0039e6",
+      "nombres": "Luciano",
+      "apellidos": "Pirillo",
+      "genero": "M",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "b93b940e-b387-4255-b843-e476188e73fc",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:26:30.646Z",
+      "actualizadoEn": "2026-08-10T00:02:45.758Z"
+    },
+    {
+      "id": "f9837194-08b3-4a9d-8984-6eecfbf7d746",
+      "nombres": "Matias",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1980",
+      "vivo": true,
+      "padres": [
+        "c1d6c568-f8ca-47e8-85bb-62d3bb6168da",
+        "cd642e5f-0402-4f2c-aff5-fc6390c149a5"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:27:27.399Z",
+      "actualizadoEn": "2026-08-10T01:18:52.793Z"
+    },
+    {
+      "id": "609c666e-ae10-4b05-b457-5e20f4c3ad29",
+      "nombres": "Yanel",
+      "apellidos": "Baudry",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "13578242-b33b-474c-9bf9-b9cef6b512fd",
+        "18cf5f2e-53ec-454d-9e82-c9a23eacaaf7"
+      ],
+      "parejas": [
+        {
+          "personaId": "d5dd2524-c2d7-442f-8e4e-21ceff3d9a64",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:27:50.236Z",
+      "actualizadoEn": "2026-08-10T00:08:13.914Z"
+    },
+    {
+      "id": "20295c7f-b96d-49a7-940b-61112a85daca",
+      "nombres": "Santiago",
+      "apellidos": "Baudry",
+      "genero": "M",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "13578242-b33b-474c-9bf9-b9cef6b512fd",
+        "18cf5f2e-53ec-454d-9e82-c9a23eacaaf7"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:29:03.177Z",
+      "actualizadoEn": "2026-08-10T00:08:28.762Z"
+    },
+    {
+      "id": "e89f36ed-3691-4c31-ad33-70f26e9b40f3",
+      "nombres": "Astrid",
+      "apellidos": "Croci",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1977",
+      "vivo": true,
+      "padres": [],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:29:35.106Z",
+      "actualizadoEn": "2026-08-10T01:32:24.730Z"
+    },
+    {
+      "id": "b24be73a-0b44-402e-a33e-a16902320153",
+      "nombres": "Andre",
+      "apellidos": "Croci",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "2000",
+      "vivo": true,
+      "padres": [
+        "e89f36ed-3691-4c31-ad33-70f26e9b40f3"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T18:30:33.474Z",
+      "actualizadoEn": "2026-08-10T00:02:45.778Z"
+    },
+    {
+      "id": "0960a788-219c-4286-b1f4-8cfc6ac1132f",
+      "nombres": "Juana Ester",
+      "apellidos": "Castro",
+      "genero": "F",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "05574b71-7783-42ed-91f4-73113773d966",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T19:21:59.640Z",
+      "actualizadoEn": "2026-08-10T00:02:45.783Z"
+    },
+    {
+      "id": "02cf923a-3ba2-4185-badd-952e301ee15c",
+      "nombres": "Maria Cristina",
+      "apellidos": "Kuhnle",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1949-01-11",
+      "vivo": true,
+      "padres": [
+        "a414aa9d-5f80-4fd3-b47b-599ed1bc254a"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T19:33:04.786Z",
+      "actualizadoEn": "2026-08-10T00:02:45.789Z"
+    },
+    {
+      "id": "a80bd84b-84d1-4bc1-825b-c72f222423f2",
+      "nombres": "Guillermo",
+      "apellidos": "Vidal",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1946",
+      "vivo": false,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "9fb33ee6-1754-4513-ba3d-0057b942102e",
+          "tipo": "separado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T19:33:44.641Z",
+      "actualizadoEn": "2026-08-10T00:02:45.794Z"
+    },
+    {
+      "id": "a414aa9d-5f80-4fd3-b47b-599ed1bc254a",
+      "nombres": "Padre o madre",
+      "apellidos": "Kuhnle",
+      "fotos": [],
+      "vivo": false,
+      "notas": "Ficha creada para poder vincular como hermanos a Maria Cristina Kuhnle y quien se cargue ahora. Completá el nombre cuando lo sepan.",
+      "padres": [],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T20:06:58.401Z",
+      "actualizadoEn": "2026-08-09T20:06:58.401Z"
+    },
+    {
+      "id": "7bde3e94-40e0-4aeb-a4b2-6329d59e46ca",
+      "nombres": "Graciela",
+      "apellidos": "Kuhnle",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1954",
+      "vivo": true,
+      "padres": [
+        "a414aa9d-5f80-4fd3-b47b-599ed1bc254a"
+      ],
+      "parejas": [
+        {
+          "personaId": "0e131e36-5a9a-42e3-940c-cd25497b3edd",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T20:06:58.457Z",
+      "actualizadoEn": "2026-08-10T00:02:45.799Z"
+    },
+    {
+      "id": "0e131e36-5a9a-42e3-940c-cd25497b3edd",
+      "nombres": "Guillermo",
+      "apellidos": "Pombo",
+      "genero": "M",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "b87e0eba-7441-43ae-b7ed-b4cd48f5e056"
+      ],
+      "parejas": [
+        {
+          "personaId": "7bde3e94-40e0-4aeb-a4b2-6329d59e46ca",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T20:07:27.722Z",
+      "actualizadoEn": "2026-08-10T01:27:25.816Z"
+    },
+    {
+      "id": "60206d1a-5b65-4ea1-b222-ee13a15bc299",
+      "nombres": "Alejandra",
+      "apellidos": "Vidal",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1981-07-01",
+      "vivo": true,
+      "padres": [
+        "9fb33ee6-1754-4513-ba3d-0057b942102e",
+        "a80bd84b-84d1-4bc1-825b-c72f222423f2"
+      ],
+      "parejas": [
+        {
+          "personaId": "e570ae0b-d35b-4a1b-930e-841bfe02c441",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:23:35.962Z",
+      "actualizadoEn": "2026-08-09T22:26:38.237Z"
+    },
+    {
+      "id": "21bca042-592c-4741-a22d-41169657a357",
+      "nombres": "Gabriel",
+      "apellidos": "Vidal",
+      "genero": "M",
+      "fotos": [],
+      "fechaNacimiento": "1975-12-27",
+      "vivo": true,
+      "padres": [
+        "9fb33ee6-1754-4513-ba3d-0057b942102e",
+        "a80bd84b-84d1-4bc1-825b-c72f222423f2"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:24:30.774Z",
+      "actualizadoEn": "2026-08-09T22:26:50.237Z"
+    },
+    {
+      "id": "9fb33ee6-1754-4513-ba3d-0057b942102e",
+      "nombres": "Graciela",
+      "apellidos": "Bressan",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1950",
+      "vivo": false,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "a80bd84b-84d1-4bc1-825b-c72f222423f2",
+          "tipo": "separado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:26:16.152Z",
+      "actualizadoEn": "2026-08-10T00:02:45.808Z"
+    },
+    {
+      "id": "cc14d515-2676-409d-ac08-778d3d89f65a",
+      "nombres": "Noemi",
+      "apellidos": "Lombardi",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1946-03-17",
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "1e6fc9d3-ffe2-4eda-8dbc-119f1a405fb9",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:31:03.366Z",
+      "actualizadoEn": "2026-08-10T00:02:45.814Z"
+    },
+    {
+      "id": "dddab6eb-9cea-4881-b394-99e088ffd0c4",
+      "nombres": "Olinda",
+      "apellidos": "Baudry",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1942",
+      "vivo": false,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "b2465712-87b5-4c76-a6f1-7068f437648a",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:33:45.228Z",
+      "actualizadoEn": "2026-08-09T22:33:45.228Z"
+    },
+    {
+      "id": "76c84757-db79-4ed7-b984-a29c3170ebd1",
+      "nombres": "Maria",
+      "apellidos": "Baudry",
+      "apodo": "Mary",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1944",
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "679f794e-344c-43cd-a99e-9855e3b84cdb",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:34:22.532Z",
+      "actualizadoEn": "2026-08-09T22:34:22.532Z"
+    },
+    {
+      "id": "0d9e824b-ac3d-4ecc-b853-c059f95127cd",
+      "nombres": "Beatriz",
+      "apellidos": "Baudry",
+      "apodo": "Titi",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "1942",
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "679f794e-344c-43cd-a99e-9855e3b84cdb",
+          "tipo": "separado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:41:24.779Z",
+      "actualizadoEn": "2026-08-10T01:12:32.054Z"
+    },
+    {
+      "id": "d5dd2524-c2d7-442f-8e4e-21ceff3d9a64",
+      "nombres": "Nadim",
+      "apellidos": "Nadim",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "609c666e-ae10-4b05-b457-5e20f4c3ad29",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:42:44.266Z",
+      "actualizadoEn": "2026-08-09T22:42:44.266Z"
+    },
+    {
+      "id": "f8659ec2-3b4a-4457-bf8b-e291e56168a2",
+      "nombres": "Cloe",
+      "apellidos": "Nadim",
+      "genero": "F",
+      "fotos": [],
+      "fechaNacimiento": "2020",
+      "vivo": true,
+      "padres": [
+        "609c666e-ae10-4b05-b457-5e20f4c3ad29",
+        "d5dd2524-c2d7-442f-8e4e-21ceff3d9a64"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-09T22:43:38.367Z",
+      "actualizadoEn": "2026-08-09T22:43:47.477Z"
+    },
+    {
+      "id": "18cf5f2e-53ec-454d-9e82-c9a23eacaaf7",
+      "nombres": "Silvia",
+      "apellidos": "Baudry",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "13578242-b33b-474c-9bf9-b9cef6b512fd",
+          "tipo": "separado"
+        }
+      ],
+      "creadoEn": "2026-08-10T00:07:41.537Z",
+      "actualizadoEn": "2026-08-10T00:07:41.537Z"
+    },
+    {
+      "id": "cd642e5f-0402-4f2c-aff5-fc6390c149a5",
+      "nombres": "Mirta",
+      "apellidos": "Baudry",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "c1d6c568-f8ca-47e8-85bb-62d3bb6168da",
+          "tipo": "separado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:18:39.077Z",
+      "actualizadoEn": "2026-08-10T01:18:39.077Z"
+    },
+    {
+      "id": "f317d99a-cea8-484f-ab05-78f3bf33037e",
+      "nombres": "Ricardo",
+      "apellidos": "Quiroga",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "019b3068-9323-4cd0-ac10-79f7e079d348",
+          "tipo": "casado"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:19:45.786Z",
+      "actualizadoEn": "2026-08-10T01:19:45.786Z"
+    },
+    {
+      "id": "ca3bd27b-9f3c-44c4-9a74-b217e0c57758",
+      "nombres": "Pedro",
+      "apellidos": "Karme",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "1050fc50-62ec-4f27-8119-1fbc7e6a9ae3",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:20:40.280Z",
+      "actualizadoEn": "2026-08-10T01:20:40.280Z"
+    },
+    {
+      "id": "e570ae0b-d35b-4a1b-930e-841bfe02c441",
+      "nombres": "Ariel",
+      "apellidos": "Cachazo",
+      "apodo": "Cacho",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "60206d1a-5b65-4ea1-b222-ee13a15bc299",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:21:28.116Z",
+      "actualizadoEn": "2026-08-10T01:21:28.116Z"
+    },
+    {
+      "id": "0086c78d-3839-45ac-b863-4948701007c7",
+      "nombres": "Juan",
+      "apellidos": "Cachazo",
+      "fotos": [],
+      "fechaNacimiento": "2005",
+      "vivo": true,
+      "padres": [
+        "60206d1a-5b65-4ea1-b222-ee13a15bc299",
+        "e570ae0b-d35b-4a1b-930e-841bfe02c441"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:22:24.722Z",
+      "actualizadoEn": "2026-08-10T01:22:24.722Z"
+    },
+    {
+      "id": "6ab08a57-defb-42af-b237-dad8d349f6b0",
+      "nombres": "Emilia",
+      "apellidos": "Cachazo",
+      "fotos": [],
+      "fechaNacimiento": "2019",
+      "vivo": true,
+      "padres": [
+        "60206d1a-5b65-4ea1-b222-ee13a15bc299",
+        "e570ae0b-d35b-4a1b-930e-841bfe02c441"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:22:53.396Z",
+      "actualizadoEn": "2026-08-10T01:22:53.396Z"
+    },
+    {
+      "id": "52dfaf7b-71d2-4941-b006-69928669d1fa",
+      "nombres": "Agustin",
+      "apellidos": "Pombo",
+      "fotos": [],
+      "fechaNacimiento": "1980",
+      "vivo": true,
+      "padres": [
+        "0e131e36-5a9a-42e3-940c-cd25497b3edd"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:25:00.328Z",
+      "actualizadoEn": "2026-08-10T01:25:56.448Z"
+    },
+    {
+      "id": "be7afd17-536b-4da7-98cd-7269bb5a6556",
+      "nombres": "Victoria",
+      "apellidos": "Pombo",
+      "fotos": [],
+      "fechaNacimiento": "1981",
+      "vivo": true,
+      "padres": [
+        "0e131e36-5a9a-42e3-940c-cd25497b3edd"
+      ],
+      "parejas": [
+        {
+          "personaId": "f81601ad-71c6-4e81-975f-715a7ab7c089",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:25:29.113Z",
+      "actualizadoEn": "2026-08-10T01:25:43.171Z"
+    },
+    {
+      "id": "f81601ad-71c6-4e81-975f-715a7ab7c089",
+      "nombres": "Pablo",
+      "apellidos": "Gallo",
+      "fotos": [],
+      "vivo": true,
+      "padres": [],
+      "parejas": [
+        {
+          "personaId": "be7afd17-536b-4da7-98cd-7269bb5a6556",
+          "tipo": "pareja"
+        }
+      ],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:26:56.006Z",
+      "actualizadoEn": "2026-08-10T01:26:56.006Z"
+    },
+    {
+      "id": "b87e0eba-7441-43ae-b7ed-b4cd48f5e056",
+      "nombres": "Padre o madre",
+      "apellidos": "Pombo",
+      "fotos": [],
+      "vivo": false,
+      "notas": "Ficha creada para poder vincular como hermanos a Guillermo Pombo y quien se cargue ahora. Completá el nombre cuando lo sepan.",
+      "padres": [],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:27:24.418Z",
+      "actualizadoEn": "2026-08-10T01:27:24.418Z"
+    },
+    {
+      "id": "dc356d70-1de1-46a0-bdd2-5ef410b894c4",
+      "nombres": "Ricardo",
+      "apellidos": "Pombo",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "b87e0eba-7441-43ae-b7ed-b4cd48f5e056"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:27:26.819Z",
+      "actualizadoEn": "2026-08-10T01:27:26.819Z"
+    },
+    {
+      "id": "3717e2f0-8c1b-4400-a8d9-d7585446d0d9",
+      "nombres": "Andres",
+      "apellidos": "Pombo",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "dc356d70-1de1-46a0-bdd2-5ef410b894c4"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:27:55.215Z",
+      "actualizadoEn": "2026-08-10T01:27:55.215Z"
+    },
+    {
+      "id": "22e83bbd-9883-4cc7-aae9-c46a1b4e4078",
+      "nombres": "Fernando",
+      "apellidos": "Pombo",
+      "fotos": [],
+      "fechaNacimiento": "1982",
+      "vivo": true,
+      "padres": [
+        "0e131e36-5a9a-42e3-940c-cd25497b3edd"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:28:35.299Z",
+      "actualizadoEn": "2026-08-10T01:28:51.930Z"
+    },
+    {
+      "id": "83b90180-6d05-4b24-9d9f-b03bab838457",
+      "nombres": "Andes",
+      "apellidos": "Pombo",
+      "fotos": [],
+      "vivo": true,
+      "padres": [
+        "52dfaf7b-71d2-4941-b006-69928669d1fa"
+      ],
+      "parejas": [],
+      "creadoPor": "Ariel Baudry",
+      "actualizadoPor": "Ariel Baudry",
+      "creadoEn": "2026-08-10T01:29:33.261Z",
+      "actualizadoEn": "2026-08-10T01:29:33.261Z"
+    }
+  ]
+}

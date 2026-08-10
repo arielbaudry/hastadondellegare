@@ -122,6 +122,19 @@ export async function leerFoto(nombre: string): Promise<{ bytes: Buffer; tipo: s
   try {
     return { bytes: await fs.readFile(path.join(DIR_UPLOADS, nombre)), tipo: tipoDe(nombre) };
   } catch {
+    // En el espejo las fotos viven en el sitio publicado: se piden allá en vez
+    // de mostrar el hueco.
+    const principal = process.env.SITIO_PRINCIPAL;
+    if (process.env.ES_ESPEJO === "1" && principal) {
+      try {
+        const res = await fetch(`${principal.replace(/\/$/, "")}/api/fotos/${nombre}`);
+        if (res.ok) {
+          return { bytes: Buffer.from(await res.arrayBuffer()), tipo: tipoDe(nombre) };
+        }
+      } catch {
+        /* si el sitio no responde, se muestra sin foto */
+      }
+    }
     return null;
   }
 }

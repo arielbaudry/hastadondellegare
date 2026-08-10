@@ -1,7 +1,8 @@
 # Hasta dónde llegaré — memoria del proyecto
 
-Árbol genealógico familiar colaborativo. **Toda la documentación está en
-`README.md`**: modelo de datos, arquitectura, algoritmo de dibujo, drivers de
+Árbol genealógico familiar colaborativo. **La documentación está en la carpeta
+[`docs/`](docs/)**, y hay una página con estado en vivo en el tablero del
+servidor (https://192.168.1.71/arbol). El `README.md`: modelo de datos, arquitectura, algoritmo de dibujo, drivers de
 persistencia, pasos de deploy en Vercel y el estado de seguridad.
 
 Lo que conviene tener presente antes de tocar código:
@@ -67,6 +68,14 @@ Lo que conviene tener presente antes de tocar código:
 - **Puerto local 8096** (`scripts/start_local.sh`, `@reboot` en el crontab,
   regla ufw para `192.168.1.0/24`).
 - `storage/` está en `.gitignore`: los datos de la familia no van al repo.
+
+## El que manda es producción
+
+**https://hastadondellegare.vercel.app es el árbol real.** El 8096 de este
+servidor es un espejo de sólo lectura que se sincroniza cada 10 minutos
+(`scripts/sincronizar.sh`). Nunca correr `npm run publicar` sin pensarlo: pisa lo
+que cargó la familia con la copia local, que está siempre atrás. Por eso exige
+`CONFIRMO=pisar-produccion`.
 
 ## Dónde vive
 

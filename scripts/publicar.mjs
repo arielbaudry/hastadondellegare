@@ -8,12 +8,15 @@
  *      servidor, que producción no puede alcanzar.
  *   3. Manda el árbol entero a /api/importar.
  *
- * Uso (una sola vez):
+ * ⚠ ESTO PISA EL ÁRBOL PUBLICADO. Se usó una sola vez, para la mudanza inicial.
  *
- *   SITIO=https://hastadondellegare.vercel.app ADMIN_CLAVE=... npm run publicar
+ * **El árbol que vale es el de producción**, que es donde carga la familia. Este
+ * servidor sólo guarda copias (ver `npm run respaldar`). Volver a correr esto
+ * reemplazaría lo que cargaron todos por la copia vieja de acá.
  *
- * `ADMIN_CLAVE` es la que hayas puesto en Vercel. No hace falta ningún token
- * más: las fotos viajan por la propia API del sitio.
+ * Por eso exige confirmación explícita:
+ *
+ *   SITIO=... ADMIN_CLAVE=... CONFIRMO=pisar-produccion npm run publicar
  */
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -25,6 +28,16 @@ const CLAVE = process.env.ADMIN_CLAVE;
 
 if (!SITIO || !CLAVE) {
   console.error("Faltan SITIO y/o ADMIN_CLAVE. Ver el encabezado de este archivo.");
+  process.exit(1);
+}
+
+if (process.env.CONFIRMO !== "pisar-produccion") {
+  console.error(
+    "\n  Esto REEMPLAZA el árbol publicado por la copia local, y la copia local\n" +
+      "  está vieja: la familia carga en producción.\n\n" +
+      "  Si de verdad querés pisarlo:  CONFIRMO=pisar-produccion npm run publicar\n" +
+      "  Si lo que querías era una copia de seguridad:  npm run respaldar\n",
+  );
   process.exit(1);
 }
 

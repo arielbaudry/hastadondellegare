@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { driver, estadoAlmacenamiento, leerArbol, mutarArbol, puedeGuardar } from "@/lib/store";
 import { arbolDeEjemplo } from "@/lib/ejemplo";
-import { bloquearSiNoPuedeVer, permisosDe } from "@/lib/permisos";
+import { ES_ESPEJO, permisosDe, SITIO_PRINCIPAL } from "@/lib/permisos";
 import { accesoRestringido, ADMIN_EMAIL, smtpConfigurado } from "@/lib/sesion";
 
 export const dynamic = "force-dynamic";
@@ -92,6 +92,7 @@ async function responder(req: Request) {
       sesion: permisos.sesion,
       contacto: { email: ADMIN_EMAIL, telefono: process.env.CONTACTO_TELEFONO ?? "" },
       configuracion: { accesoRestringido: accesoRestringido(), smtp: smtpConfigurado() },
+      espejo: ES_ESPEJO ? { principal: SITIO_PRINCIPAL } : null,
     },
     { headers: { "Cache-Control": "no-store" } },
   );
