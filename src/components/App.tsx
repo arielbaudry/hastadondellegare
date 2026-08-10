@@ -19,6 +19,8 @@ import {
   guardarFoco,
   leerAutor,
   leerFocoGuardado,
+  leerMiFicha,
+  guardarMiFicha,
   deshacerCambio,
   sembrar,
   traerArbol,
@@ -41,6 +43,7 @@ import {
   padresDe,
   parejasDe,
 } from "@/lib/tree";
+import { buscarPersona, esInequivoca } from "@/lib/coincidencias";
 import { revisar } from "@/lib/revision";
 import type { Persona, PersonaEntrada } from "@/lib/types";
 
@@ -66,6 +69,8 @@ export default function App() {
   const [contacto, setContacto] = useState({ email: "ariel@baudry.com.ar", telefono: "" });
   const [espejo, setEspejo] = useState<{ principal: string } | null>(null);
   const [bitacora, setBitacora] = useState<Movimiento[]>([]);
+  /** La ficha de quien está usando este navegador; a ella vuelve la marca. */
+  const [miFicha, setMiFicha] = useState<string | null>(null);
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
@@ -97,6 +102,7 @@ export default function App() {
     const t = window.localStorage.getItem("hdll:tema") ?? "claro";
     if (t === "claro" || t === "oscuro") document.documentElement.setAttribute("data-tema", t);
     setAutor(leerAutor());
+    setMiFicha(leerMiFicha());
   }, []);
 
   const edicionRef = useRef<Edicion>(null);
@@ -174,6 +180,19 @@ export default function App() {
       window.clearInterval(id);
     };
   }, [autor, permisos.puedeVer, espejo]);
+
+  /**
+   * Para quien ya venía usando el sitio antes de que se recordara la ficha
+   * propia: se deduce del nombre declarado, y sólo si no hay dudas.
+   */
+  const deducirMiFicha = useCallback(() => {
+    if (!autor) return null;
+    const c = buscarPersona(autor, personas);
+    if (!esInequivoca(c)) return null;
+    guardarMiFicha(c[0].persona.id);
+    setMiFicha(c[0].persona.id);
+    return c[0].persona.id;
+  }, [autor, personas]);
 
   const foco = useMemo(() => personas.find((p) => p.id === focoId) ?? null, [personas, focoId]);
 
@@ -447,6 +466,8 @@ export default function App() {
     setPersonas(lista);
     setAutor(nombres);
     guardarAutor(nombres);
+    setMiFicha(res.persona.id);
+    guardarMiFicha(res.persona.id);
     setFocoId(res.persona.id);
     guardarFoco(res.persona.id);
   }
@@ -538,6 +559,8 @@ export default function App() {
           // El árbol abre en la ficha de quien entra: lo primero que uno quiere
           // ver es dónde está parado en su propia familia.
           if (id) {
+            setMiFicha(id);
+            guardarMiFicha(id);
             setFocoId(id);
             guardarFoco(id);
           }
@@ -554,17 +577,18 @@ export default function App() {
       <header className="cabecera">
         <button
           className="marca"
-          title="Volver al inicio"
+          title="Ir a mi ficha"
           onClick={() => {
             setVista("arbol");
             setMenuAbierto(false);
             setEdicion(null);
             setPanelAbierto(window.innerWidth > 900);
             setHistorial([]);
-            const raiz = ordenarPorNacimiento(personas).at(0);
-            if (raiz) {
-              setFocoId(raiz.id);
-              guardarFoco(raiz.id);
+            const mia = miFicha && personas.some((p) => p.id === miFicha) ? miFicha : null;
+            const destino = mia ?? deducirMiFicha() ?? ordenarPorNacimiento(personas).at(0)?.id;
+            if (destino) {
+              setFocoId(destino);
+              guardarFoco(destino);
             }
           }}
         >

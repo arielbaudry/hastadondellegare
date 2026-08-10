@@ -61,6 +61,19 @@ export function guardarAutor(nombre: string): void {
   window.localStorage.setItem(CLAVE_AUTOR, nombre.trim());
 }
 
+const CLAVE_MI_FICHA = "hdll:miFicha";
+
+/** Cuál de las personas del árbol es quien está usando este navegador. */
+export function leerMiFicha(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(CLAVE_MI_FICHA);
+}
+
+export function guardarMiFicha(id: string | null): void {
+  if (id) window.localStorage.setItem(CLAVE_MI_FICHA, id);
+  else window.localStorage.removeItem(CLAVE_MI_FICHA);
+}
+
 export function leerFocoGuardado(): string | null {
   if (typeof window === "undefined") return null;
   return window.localStorage.getItem(CLAVE_FOCO);
