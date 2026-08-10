@@ -145,23 +145,6 @@ export default function FormularioPersona({
               />
             </div>
             <div className="campo">
-              <label htmlFor="f-genero">Género</label>
-              <select
-                id="f-genero"
-                value={d.genero ?? ""}
-                onChange={(e) =>
-                  campo("genero", (e.target.value || undefined) as "F" | "M" | undefined)
-                }
-              >
-                <option value="">— sin especificar —</option>
-                <option value="F">Mujer</option>
-                <option value="M">Varón</option>
-              </select>
-              <span className="ayuda">
-                Sólo para nombrar bien los parentescos: «tía abuela» en vez de «tío/a abuelo/a».
-              </span>
-            </div>
-            <div className="campo">
               <label htmlFor="f-apnac">Apellido de nacimiento</label>
               <input
                 id="f-apnac"

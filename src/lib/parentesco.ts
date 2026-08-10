@@ -20,9 +20,17 @@ import type { Persona } from "./types";
  * el pariente de la pareja (suegros, cuñados, yernos, tíos políticos).
  */
 
+/** Las dos formas de un mismo vínculo; el género decide cuál se muestra. */
+interface Formas {
+  m: string;
+  f: string;
+}
+
 export interface Parentesco {
   /** Etiqueta lista para mostrar, ya con el género de la persona. */
   etiqueta: string;
+  /** Forma neutra ("tío/a abuelo/a"), para grupos de género mezclado. */
+  neutro: string;
   /** Agrupa a quienes tienen el mismo vínculo. */
   clave: string;
   /** Menor es más cercano: ordena la ficha de adentro hacia afuera. */
@@ -44,27 +52,47 @@ function ambos(m: string, f: string): string {
     .join(" ");
 }
 
-function segun(p: Persona, m: string, f: string): string {
+/** Deshace `ambos()`: de "tío/a abuelo/a" vuelve a "tío abuelo" y "tía abuela". */
+function separar(neutro: string): Formas {
+  const partes = neutro.split(" ");
+  return {
+    m: partes.map((x) => (x.includes("/") ? x.split("/")[0] : x.includes(" o ") ? x : x)).join(" "),
+    f: partes
+      .map((x) => {
+        if (!x.includes("/")) return x;
+        const [base, term] = x.split("/");
+        return base.slice(0, -1) + term;
+      })
+      .join(" "),
+  };
+}
+
+function segun(p: Persona, { m, f }: Formas): string {
   if (p.genero === "M") return m;
   if (p.genero === "F") return f;
   return ambos(m, f);
 }
 
+/** Arma el resultado final resolviendo el género recién al mostrar. */
+function armar(otro: Persona, formas: Formas, clave: string, orden: number): Parentesco {
+  return { etiqueta: segun(otro, formas), neutro: ambos(formas.m, formas.f), clave, orden };
+}
+
 const GRADO = ["", "bis", "tatara", "tatatara"];
 
 /** "abuelo", "bisabuelo", "tatarabuelo"… según cuántas generaciones sube. */
-function ascendiente(n: number, p: Persona): string {
-  if (n === 1) return segun(p, "padre", "madre");
-  if (n === 2) return segun(p, "abuelo", "abuela");
+function ascendiente(n: number): Formas {
+  if (n === 1) return { m: "padre", f: "madre" };
+  if (n === 2) return { m: "abuelo", f: "abuela" };
   const pre = GRADO[n - 2] ?? `${n - 2}× tatara`;
-  return segun(p, `${pre}abuelo`, `${pre}abuela`);
+  return { m: `${pre}abuelo`, f: `${pre}abuela` };
 }
 
-function descendiente(n: number, p: Persona): string {
-  if (n === 1) return segun(p, "hijo", "hija");
-  if (n === 2) return segun(p, "nieto", "nieta");
+function descendiente(n: number): Formas {
+  if (n === 1) return { m: "hijo", f: "hija" };
+  if (n === 2) return { m: "nieto", f: "nieta" };
   const pre = GRADO[n - 2] ?? `${n - 2}× tatara`;
-  return segun(p, `${pre}nieto`, `${pre}nieta`);
+  return { m: `${pre}nieto`, f: `${pre}nieta` };
 }
 
 const ORDINAL: [string, string][] = [
@@ -105,11 +133,11 @@ function porSangre(
 
   if (a.has(hacia)) {
     const n = a.get(hacia)!;
-    return { etiqueta: ascendiente(n, otro), clave: `asc-${n}`, orden: n };
+    return armar(otro, ascendiente(n), `asc-${n}`, n);
   }
   if (b.has(desde)) {
     const n = b.get(desde)!;
-    return { etiqueta: descendiente(n, otro), clave: `desc-${n}`, orden: 100 + n };
+    return armar(otro, descendiente(n), `desc-${n}`, 100 + n);
   }
 
   // Antepasado común que minimice la distancia total.
@@ -128,36 +156,27 @@ function porSangre(
     const compartidos = otro.padres.filter((x) => yo.padres.includes(x)).length;
     const medio = compartidos < Math.min(yo.padres.length, otro.padres.length) || compartidos < 2;
     return medio
-      ? { etiqueta: segun(otro, "medio hermano", "media hermana"), clave: "medio-hermano", orden: 11 }
-      : { etiqueta: segun(otro, "hermano", "hermana"), clave: "hermano", orden: 10 };
+      ? armar(otro, { m: "medio hermano", f: "media hermana" }, "medio-hermano", 11)
+      : armar(otro, { m: "hermano", f: "hermana" }, "hermano", 10);
   }
 
   if (da === 1) {
     const g = db - 1;
     const base = g === 1 ? "" : g === 2 ? " nieto" : ` ${GRADO[g - 1] ?? ""}nieto`;
     const baseF = g === 1 ? "" : g === 2 ? " nieta" : ` ${GRADO[g - 1] ?? ""}nieta`;
-    return {
-      etiqueta: segun(otro, `sobrino${base}`, `sobrina${baseF}`),
-      clave: `sobrino-${g}`,
-      orden: 120 + g,
-    };
+    return armar(otro, { m: `sobrino${base}`, f: `sobrina${baseF}` }, `sobrino-${g}`, 120 + g);
   }
 
   if (db === 1) {
     const g = da - 1;
     const base = g === 1 ? "" : g === 2 ? " abuelo" : ` ${GRADO[g - 1] ?? ""}abuelo`;
     const baseF = g === 1 ? "" : g === 2 ? " abuela" : ` ${GRADO[g - 1] ?? ""}abuela`;
-    return {
-      etiqueta: segun(otro, `tío${base}`, `tía${baseF}`),
-      clave: `tio-${g}`,
-      orden: 20 + g,
-    };
+    return armar(otro, { m: `tío${base}`, f: `tía${baseF}` }, `tio-${g}`, 20 + g);
   }
 
   const grado = Math.min(da, db) - 1;
   const removido = Math.abs(da - db);
   const par = ORDINAL[grado + 1] ?? [`de grado ${grado}`, `de grado ${grado}`];
-  const ordinal = grado > 1 ? ` ${segun(otro, par[0], par[1])}` : "";
   // "removido" es el término técnico, pero nadie lo dice: se explica en criollo.
   const sufijo =
     removido === 0
@@ -165,11 +184,15 @@ function porSangre(
       : removido === 1
         ? " (de otra generación)"
         : ` (a ${removido} generaciones)`;
-  return {
-    etiqueta: `${segun(otro, "primo", "prima")}${ordinal}${sufijo}`,
-    clave: `primo-${grado}-${removido}`,
-    orden: 40 + grado * 2 + removido,
-  };
+  return armar(
+    otro,
+    {
+      m: `primo${grado > 1 ? ` ${par[0]}` : ""}${sufijo}`,
+      f: `prima${grado > 1 ? ` ${par[1]}` : ""}${sufijo}`,
+    },
+    `primo-${grado}-${removido}`,
+    40 + grado * 2 + removido,
+  );
 }
 
 /**
@@ -189,13 +212,13 @@ export function parentescoCon(
 
   const vinculo = yo.parejas.find((v) => v.personaId === hacia);
   if (vinculo) {
-    const etiqueta =
+    const formas: Formas =
       vinculo.tipo === "casado"
-        ? segun(otro, "esposo", "esposa")
+        ? { m: "esposo", f: "esposa" }
         : vinculo.tipo === "separado"
-          ? segun(otro, "ex pareja", "ex pareja")
-          : segun(otro, "pareja", "pareja");
-    return { etiqueta, clave: "pareja", orden: 1 };
+          ? { m: "ex pareja", f: "ex pareja" }
+          : { m: "pareja", f: "pareja" };
+    return armar(otro, formas, "pareja", 1);
   }
 
   const sangre = porSangre(desde, hacia, ix);
@@ -206,22 +229,20 @@ export function parentescoCon(
     const p = porSangre(desde, v.personaId, ix);
     if (!p) continue;
     if (p.clave === "hermano" || p.clave === "medio-hermano") {
-      return { etiqueta: segun(otro, "cuñado", "cuñada"), clave: "cunado", orden: 12 };
+      return armar(otro, { m: "cuñado", f: "cuñada" }, "cunado", 12);
     }
-    if (p.clave === "desc-1") {
-      return { etiqueta: segun(otro, "yerno", "nuera"), clave: "yerno", orden: 102 };
-    }
+    if (p.clave === "desc-1") return armar(otro, { m: "yerno", f: "nuera" }, "yerno", 102);
     if (p.clave === "asc-1") {
-      return { etiqueta: segun(otro, "padrastro", "madrastra"), clave: "padrastro", orden: 2.5 };
+      return armar(otro, { m: "padrastro", f: "madrastra" }, "padrastro", 2.5);
     }
-    return {
-      etiqueta: `${p.etiqueta} político${otro.genero === "F" ? "" : ""}`.replace(
-        /político$/,
-        otro.genero === "F" ? "política" : otro.genero === "M" ? "político" : "político/a",
-      ),
-      clave: `${p.clave}-politico`,
-      orden: p.orden + 0.5,
-    };
+    // "político" tiene que concordar con la misma forma que lo precede.
+    const base = separar(p.neutro);
+    return armar(
+      otro,
+      { m: `${base.m} político`, f: `${base.f} política` },
+      `${p.clave}-politico`,
+      p.orden + 0.5,
+    );
   }
 
   // Afinidad 2: es pariente de mi pareja (suegros, cuñados, concuñados).
@@ -229,19 +250,20 @@ export function parentescoCon(
     const p = porSangre(v.personaId, hacia, ix);
     if (!p) continue;
     if (p.clave === "desc-1") {
-      return { etiqueta: segun(otro, "hijastro", "hijastra"), clave: "hijastro", orden: 101.5 };
+      return armar(otro, { m: "hijastro", f: "hijastra" }, "hijastro", 101.5);
     }
-    if (p.clave === "asc-1") {
-      return { etiqueta: segun(otro, "suegro", "suegra"), clave: "suegro", orden: 3 };
-    }
+    if (p.clave === "asc-1") return armar(otro, { m: "suegro", f: "suegra" }, "suegro", 3);
     if (p.clave === "hermano" || p.clave === "medio-hermano") {
-      return { etiqueta: segun(otro, "cuñado", "cuñada"), clave: "cunado", orden: 12 };
+      return armar(otro, { m: "cuñado", f: "cuñada" }, "cunado", 12);
     }
-    return {
-      etiqueta: `${p.etiqueta} de ${ix.get(v.personaId)!.nombres.split(" ")[0]}`,
-      clave: `pareja-${p.clave}`,
-      orden: p.orden + 0.6,
-    };
+    const quien = ix.get(v.personaId)!.nombres.split(" ")[0];
+    const base = separar(p.neutro);
+    return armar(
+      otro,
+      { m: `${base.m} de ${quien}`, f: `${base.f} de ${quien}` },
+      `pareja-${p.clave}`,
+      p.orden + 0.6,
+    );
   }
 
   return null;
@@ -265,8 +287,9 @@ export function linajeDe(id: string, personas: Persona[]): GrupoParentesco[] {
     const g = grupos.get(p.clave);
     if (g) {
       g.gente.push(otro);
-      // Con géneros mezclados gana la forma neutra del primero que la tenga.
-      if (g.titulo !== p.etiqueta && p.etiqueta.includes("/")) g.titulo = p.etiqueta;
+      // El título sólo lleva género si TODO el grupo lo comparte; con géneros
+      // mezclados —o alguno sin dato— va la forma neutra.
+      if (g.titulo !== p.etiqueta) g.titulo = p.neutro;
     } else {
       grupos.set(p.clave, { clave: p.clave, titulo: p.etiqueta, gente: [otro], orden: p.orden });
     }

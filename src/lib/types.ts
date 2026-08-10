@@ -27,8 +27,11 @@ export interface Persona {
   apellidos: string;
   apodo?: string;
   /**
-   * Sólo se usa para nombrar bien los parentescos ("tía abuela" y no
-   * "tío/a abuelo/a"). Es opcional: sin dato se muestra la forma neutra.
+   * Sólo sirve para nombrar bien los parentescos ("tía abuela" y no "tío/a
+   * abuelo/a"), y **no se pregunta en el formulario**: en una familia puede
+   * incomodar, y no vale la molestia por una etiqueta. Se cargó una vez para
+   * las fichas históricas y quien quiera puede corregirlo por la API. Sin dato,
+   * el parentesco se muestra en forma neutra y no pasa nada.
    */
   genero?: "F" | "M";
   /** Apellido de soltera / de nacimiento, si cambió. Clave para rastrear ramas. */
