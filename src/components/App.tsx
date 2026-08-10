@@ -50,6 +50,14 @@ import type { Persona, PersonaEntrada } from "@/lib/types";
 
 type Vista = "arbol" | "personas" | "revision" | "ajustes";
 
+/** Las cuatro secciones, con el trazo de su ícono para la barra del celular. */
+const SECCIONES: { v: Vista; etiqueta: string; icono: string }[] = [
+  { v: "arbol", etiqueta: "Árbol", icono: "M10 17v-3M5.5 11V9.5h9V11M5.5 9.5v-2M14.5 9.5v-2M10 14V9.5" },
+  { v: "personas", etiqueta: "Personas", icono: "M3 17c0-2.8 2.7-4.5 5-4.5s5 1.7 5 4.5M14 17c0-2.4-1.2-3.8-2.5-4.4" },
+  { v: "revision", etiqueta: "Revisión", icono: "M10 3.5l7 12.5H3l7-12.5zM10 8.5v3.5M10 14.2v.1" },
+  { v: "ajustes", etiqueta: "Ajustes", icono: "M4 6h12M4 10h12M4 14h12" },
+];
+
 /** Estado del formulario: cerrado, editando a alguien, o creando (con vínculo o sin él). */
 type Edicion =
   | null
@@ -794,29 +802,22 @@ export default function App() {
 
         <div className={`acciones${menuAbierto ? " abierto" : ""}`}>
           <nav className="pestanas" role="tablist" aria-label="Secciones">
-          {(
-            [
-              ["arbol", "Árbol"],
-              ["personas", "Personas"],
-              ["revision", "Revisión"],
-              ["ajustes", "Ajustes"],
-            ] as [Vista, string][]
-          ).map(([v, etiqueta]) => (
-            <button
-              key={v}
-              role="tab"
-              aria-selected={vista === v}
-              onClick={() => {
-                setVista(v);
-                setMenuAbierto(false);
-              }}
-            >
-              {etiqueta}
-              {v === "revision" && pendientes > 0 && (
-                <span className="globo" title={`${pendientes} cosas para revisar`}>{pendientes}</span>
-              )}
-            </button>
-          ))}
+            {SECCIONES.map(({ v, etiqueta }) => (
+              <button
+                key={v}
+                role="tab"
+                aria-selected={vista === v}
+                onClick={() => {
+                  setVista(v);
+                  setMenuAbierto(false);
+                }}
+              >
+                {etiqueta}
+                {v === "revision" && pendientes > 0 && (
+                  <span className="globo" title={`${pendientes} cosas para revisar`}>{pendientes}</span>
+                )}
+              </button>
+            ))}
           </nav>
 
           <button
@@ -903,7 +904,10 @@ export default function App() {
               </button>
 
               <span className="ruta">
-                Árbol de <strong>{nombreCompleto(foco)}</strong>
+                {/* "Árbol de" se cae en el celular: el nombre alcanza, y esos
+                    ocho caracteres son los que dejan ver el primer salto. */}
+                <span className="ruta-prefijo">Árbol de </span>
+                <strong>{nombreCompleto(foco)}</strong>
               </span>
 
               <div className="saltos">
@@ -1033,6 +1037,40 @@ export default function App() {
           }}
         />
       )}
+
+      {/*
+        En el celular las secciones viven abajo, donde llega el pulgar, y no
+        detrás de un menú: navegar era abrir el menú, elegir, y que se cerrara.
+        En pantalla grande esta barra no existe —están las pestañas de arriba—.
+      */}
+      <nav className="pestanas-abajo" role="tablist" aria-label="Secciones">
+        {SECCIONES.map(({ v, etiqueta, icono }) => (
+          <button
+            key={v}
+            role="tab"
+            aria-selected={vista === v}
+            onClick={() => {
+              setVista(v);
+              setMenuAbierto(false);
+              if (v !== "arbol") setPanelAbierto(false);
+            }}
+          >
+            <svg viewBox="0 0 20 20" width="21" height="21" aria-hidden="true">
+              <path d={icono} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+              {v === "personas" && <circle cx="8" cy="7" r="2.6" fill="currentColor" />}
+              {v === "arbol" && (
+                <g fill="currentColor">
+                  <circle cx="5.5" cy="6" r="2" />
+                  <circle cx="14.5" cy="6" r="2" />
+                  <circle cx="10" cy="18" r="2" />
+                </g>
+              )}
+            </svg>
+            <span>{etiqueta}</span>
+            {v === "revision" && pendientes > 0 && <span className="globo">{pendientes}</span>}
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }

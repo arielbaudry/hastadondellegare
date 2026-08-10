@@ -52,6 +52,21 @@ costado; un doble clic la abre para editar. Para moverse:
 - **← Atrás**, que deshace el recorrido;
 - tocar **«Hasta dónde llegaré»** te devuelve a tu propia ficha.
 
+## En el celular
+
+La aplicación cambia de forma, no de funciones:
+
+- las **cuatro secciones viven en una barra abajo**, donde llega el pulgar. No
+  hay menú de hamburguesa: navegar era abrirlo, elegir y que se cerrara;
+- el árbol se maneja con los dedos: **arrastrar** para mover y **pellizcar**
+  para acercar y alejar, más una fila de botones (`+`, `−`, centrar, ver todo);
+- la ficha sube desde abajo como una hoja y se cierra tocando la cruz;
+- **cargar y corregir se hace desde la pestaña Personas**, que abre directamente
+  en el buscador con todas las fichas debajo. Tocar una la abre para editar —el
+  lapicito lo dice—, y el botón del costado lleva al árbol parado en ella.
+  Apuntarle a una tarjeta del árbol en una pantalla de teléfono es incómodo; la
+  lista tiene buscador, filtros y todo al alcance.
+
 ## Las fechas se cargan como se sepan
 
 `1948`, `1948-03` o `1948-03-27`. De los bisabuelos casi siempre se sabe el año y

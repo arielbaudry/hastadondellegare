@@ -58,12 +58,15 @@ export default function Aviso({ restringido }: { restringido: boolean }) {
     <div className={`aviso${abierto ? " abierto" : ""}`}>
       <span aria-hidden="true">🔓</span>
       <p className="prosa" style={{ margin: 0 }}>
-        <strong>Modo abierto, sin contraseña.</strong> Cualquiera que tenga este link puede
-        agregar y corregir personas{fecha ? `, hasta el ${fecha}` : " por unos días"}.
+        {/* En el celular sólo queda el titular: el resto se lee tocando "Ver
+            más". Tres líneas de cartel se comen la primera pantalla. */}
+        <strong>Modo abierto, sin contraseña.</strong>
         <span className="aviso-detalle">
           {" "}
-          Es a propósito: así la familia carga lo que sabe sin trámite. Después vamos a
-          cerrarlo y mandar accesos personales por <em>magic link</em> al correo de cada uno.
+          Cualquiera que tenga este link puede agregar y corregir personas
+          {fecha ? `, hasta el ${fecha}` : " por unos días"}. Es a propósito: así la familia
+          carga lo que sabe sin trámite. Después vamos a cerrarlo y mandar accesos personales
+          por <em>magic link</em> al correo de cada uno.
         </span>{" "}
         {!abierto && (
           <button className="btn chico fantasma ver-mas" onClick={() => setAbierto(true)}>

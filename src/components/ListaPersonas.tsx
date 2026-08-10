@@ -113,7 +113,7 @@ export default function ListaPersonas({
   }
 
   return (
-    <div className="hoja">
+    <div className="hoja hoja-personas">
       <div className="hoja-ancho">
         <div className="metricas">
           <div className="metrica">
@@ -164,7 +164,7 @@ export default function ListaPersonas({
           </div>
         )}
 
-        <div className="barra-busqueda" style={{ marginTop: 26 }}>
+        <div className="barra-busqueda buscador-personas" style={{ marginTop: 26 }}>
           <input
             className="campo-texto"
             placeholder="Buscar por nombre, apodo, lugar o nota…"
@@ -188,7 +188,7 @@ export default function ListaPersonas({
         </div>
 
         {visibles.length === 0 ? (
-          <div className="vacio">Ninguna persona coincide con la búsqueda.</div>
+          <div className="vacio lista-vacia">Ninguna persona coincide con la búsqueda.</div>
         ) : (
           <div className="rejilla">
             {visibles.map((p) => (
@@ -213,6 +213,20 @@ export default function ListaPersonas({
                         {p.lugarNacimiento}
                       </span>
                     )}
+                  </span>
+                  {/* En el celular no hay `title` que valga: si tocar la fila
+                      edita, tiene que verse que edita. */}
+                  <span className="tarjeta-editar" aria-hidden="true">
+                    <svg viewBox="0 0 20 20" width="16" height="16">
+                      <path
+                        d="M4 16h3l8-8-3-3-8 8v3zM12.5 4.5l3 3"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        fill="none"
+                      />
+                    </svg>
                   </span>
                 </button>
 

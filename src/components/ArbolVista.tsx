@@ -108,6 +108,20 @@ export default function ArbolVista({
   const ultimoClic = useRef<{ id: string; cuando: number } | null>(null);
   /** Hubo arrastre en este gesto: el clic final no debe contar como selección. */
   const arrastro = useRef(false);
+  /** Dedos apoyados en el lienzo. Con dos, el gesto es pellizcar, no arrastrar. */
+  const dedos = useRef(new Map<number, { x: number; y: number }>());
+  const pinza = useRef<{ dist: number; x: number; y: number } | null>(null);
+
+  /** Separación entre los dos primeros dedos y su punto medio. */
+  function medirPinza() {
+    const [a, b] = [...dedos.current.values()];
+    if (!a || !b) return null;
+    return {
+      dist: Math.hypot(a.x - b.x, a.y - b.y),
+      x: (a.x + b.x) / 2,
+      y: (a.y + b.y) / 2,
+    };
+  }
   /**
    * ¿El usuario ya movió la cámara? Mientras no la haya tocado, el árbol se
    * reencuadra solo —hace falta: los carteles de arriba aparecen y se cierran
@@ -296,6 +310,15 @@ export default function ArbolVista({
       className={`lienzo${arrastrando ? " arrastrando" : ""}`}
       onPointerDown={(e) => {
         if (e.button !== 0) return;
+        dedos.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (dedos.current.size === 2) {
+          // Empieza la pinza: se guarda la separación y el punto medio, y se
+          // suelta el arrastre para que los dos dedos no muevan además la vista.
+          pinza.current = medirPinza();
+          ultimo.current = null;
+          setArrastrando(false);
+          return;
+        }
         arrastro.current = false;
         ultimo.current = { x: e.clientX, y: e.clientY };
         // Ojo: la captura del puntero NO se toma acá. Si se toma en el
@@ -304,6 +327,35 @@ export default function ArbolVista({
         // recién cuando el gesto se confirma como arrastre.
       }}
       onPointerMove={(e) => {
+        if (dedos.current.has(e.pointerId)) {
+          dedos.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        }
+
+        // Pellizcar para acercar. En el celular es el gesto natural y sin él la
+        // única forma de alejarse eran los botones: el árbol entero no entra en
+        // una pantalla de teléfono.
+        if (dedos.current.size >= 2 && pinza.current) {
+          const ahora = medirPinza();
+          if (!ahora || pinza.current.dist < 1) return;
+          const caja = contenedor.current?.getBoundingClientRect();
+          if (!caja) return;
+          camaraTocada.current = true;
+          const razonDedos = ahora.dist / pinza.current.dist;
+          const mx = ahora.x - caja.left;
+          const my = ahora.y - caja.top;
+          const mxAntes = pinza.current.x - caja.left;
+          const myAntes = pinza.current.y - caja.top;
+          pinza.current = ahora;
+          setCamara((c) => {
+            const k = Math.max(ESCALA_MIN, Math.min(ESCALA_MAX, c.k * razonDedos));
+            const razon = k / c.k;
+            // El punto entre los dedos se queda quieto, y si además se
+            // desplaza, la vista lo acompaña.
+            return { k, x: mx - (mxAntes - c.x) * razon, y: my - (myAntes - c.y) * razon };
+          });
+          return;
+        }
+
         if (!ultimo.current) return;
         const dx = e.clientX - ultimo.current.x;
         const dy = e.clientY - ultimo.current.y;
@@ -317,11 +369,15 @@ export default function ArbolVista({
         ultimo.current = { x: e.clientX, y: e.clientY };
         setCamara((c) => ({ ...c, x: c.x + dx, y: c.y + dy }));
       }}
-      onPointerUp={() => {
+      onPointerUp={(e) => {
+        dedos.current.delete(e.pointerId);
+        if (dedos.current.size < 2) pinza.current = null;
         ultimo.current = null;
         setArrastrando(false);
       }}
-      onPointerCancel={() => {
+      onPointerCancel={(e) => {
+        dedos.current.delete(e.pointerId);
+        if (dedos.current.size < 2) pinza.current = null;
         ultimo.current = null;
         setArrastrando(false);
       }}
@@ -490,13 +546,26 @@ export default function ArbolVista({
       <div className="controles-lienzo">
         <button className="btn chico" onClick={() => zoom(1.25)} aria-label="Acercar">+</button>
         <button className="btn chico" onClick={() => zoom(0.8)} aria-label="Alejar">−</button>
-        <button className="btn chico" onClick={centrarEnFoco}>Mi entorno</button>
+        {/* En el celular estos dos se muestran con un ícono (ver globals.css):
+            escritos entran cuatro botones apilados y tapan el árbol. */}
         <button
-          className="btn chico"
+          className="btn chico texto-largo"
+          data-accion="entorno"
+          onClick={centrarEnFoco}
+          title="Centrar en la persona elegida"
+          aria-label="Mi entorno"
+        >
+          Mi entorno
+        </button>
+        <button
+          className="btn chico texto-largo"
+          data-accion="todo"
           onClick={() => {
             camaraTocada.current = false;
             encuadrar();
           }}
+          title="Encuadrar el árbol completo"
+          aria-label="Ver todo"
         >
           Ver todo
         </button>

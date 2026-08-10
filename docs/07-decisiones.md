@@ -80,6 +80,17 @@ resultado, no la herramienta.
 Cada portal encendido es una puerta más y un proceso que alguien olvida. Si hace
 falta volver a cruzar, está anotado cómo.
 
+## En el celular, la lista manda
+
+El árbol se mira; se carga desde la pestaña Personas. En una pantalla de
+teléfono acertarle a una tarjeta del lienzo, abrir su ficha y de ahí editar son
+tres gestos finos; la lista es un buscador y una fila por persona.
+
+Por eso las secciones pasaron a una barra abajo y la pestaña Personas abre
+directamente en el buscador: lo que se usa para trabajar tiene que estar a un
+toque, y lo que se usa para mirar —métricas, puntas abiertas— puede esperar más
+abajo.
+
 ## Se propone, no se importa
 
 Ninguno de esos cruces escribió nada por su cuenta. El CRM tiene homónimos

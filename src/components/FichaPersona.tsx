@@ -42,11 +42,23 @@ interface Props {
 function Visor({ persona }: { persona: Persona }) {
   const fotos = persona.fotos ?? [];
   const [i, setI] = useState(0);
+  /**
+   * Las que no cargan. Una foto rota dejaba el texto alternativo desbordando la
+   * ficha —"Foto de Ariel Osvaldo…" en letras enormes—, que es justo lo que no
+   * puede pasar en una pantalla chica.
+   */
+  const [rotas, setRotas] = useState<string[]>([]);
 
   // Al cambiar de persona se vuelve a la primera foto.
-  useEffect(() => setI(0), [persona.id]);
+  useEffect(() => {
+    setI(0);
+    setRotas([]);
+  }, [persona.id]);
 
-  if (!fotos.length) {
+  const buenas = fotos.filter((f) => !rotas.includes(f));
+  const actual = buenas[Math.min(i, buenas.length - 1)];
+
+  if (!actual) {
     return (
       <span className="retrato grande" aria-hidden="true">
         {iniciales(persona)}
@@ -59,17 +71,20 @@ function Visor({ persona }: { persona: Persona }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="retrato grande"
-        src={fotos[Math.min(i, fotos.length - 1)]}
+        src={actual}
         alt={`Foto de ${nombreCompleto(persona)}`}
+        // Se anota el valor guardado, no `e.target.src`: el DOM devuelve la URL
+        // absoluta y no coincidiría nunca con la ruta que está en la ficha.
+        onError={() => setRotas((r) => [...r, actual])}
       />
-      {fotos.length > 1 && (
+      {buenas.length > 1 && (
         <div className="visor-tiras">
-          {fotos.map((url, j) => (
+          {buenas.map((url, j) => (
             <button
               key={url}
               className={`visor-tira${j === i ? " activa" : ""}`}
               onClick={() => setI(j)}
-              aria-label={`Ver la foto ${j + 1} de ${fotos.length}`}
+              aria-label={`Ver la foto ${j + 1} de ${buenas.length}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={url} alt="" />

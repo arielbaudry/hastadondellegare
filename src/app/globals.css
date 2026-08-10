@@ -8,6 +8,8 @@
 --------------------------------------------------------------------------- */
 
 :root {
+  /* Alto de la barra de secciones del celular; 0 en pantalla grande. */
+  --barra-abajo: 0px;
   --fondo: #f4f5f8;
   --superficie: #ffffff;
   --superficie-2: #f1f3f7;
@@ -462,6 +464,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   padding: 13px; border: 0; background: transparent; cursor: pointer;
 }
 .tarjeta .retrato { width: 46px; height: 46px; font-size: 16px; }
+.tarjeta-editar { display: none; }
 .tarjeta .nom { font-weight: 600; overflow-wrap: anywhere; }
 .tarjeta .met { font-size: 12.5px; color: var(--tinta-tenue); }
 
@@ -584,6 +587,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
    puede cerrar. */
 
 @media (max-width: 900px) {
+  :root { --barra-abajo: calc(54px + env(safe-area-inset-bottom, 0px)); }
   .app { height: 100vh; height: 100dvh; overflow: hidden; }
 
   .cabecera { padding: 8px 12px; gap: 8px; flex-wrap: nowrap; }
@@ -593,26 +597,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .buscador .atajo { display: none; }
   .buscador .campo-texto { padding-right: 12px; }
 
-  .boton-menu {
-    display: grid; place-items: center; flex-shrink: 0;
-    width: 38px; height: 38px; border-radius: var(--r-sm);
-    border: 1px solid var(--linea-fuerte); background: var(--superficie);
-    color: var(--tinta); cursor: pointer;
-  }
-  .boton-menu[aria-expanded="true"] { background: var(--acento); color: var(--acento-texto); border-color: transparent; }
-
-  /* El menú: pestañas y alta, fuera de la barra. */
+  /* El menú de hamburguesa se fue: las secciones están en la barra de abajo y
+     "+ Agregar persona" vive en la pestaña Personas, que es donde se busca. Un
+     nivel menos que abrir para llegar a cualquier lado. */
+  .boton-menu { display: none; }
   .acciones { display: none; }
-  .acciones.abierto {
-    display: flex; flex-direction: column; gap: 10px;
-    position: absolute; top: calc(100% + 6px); right: 10px; left: 10px; z-index: 50;
-    padding: 12px; border-radius: var(--r);
-    background: var(--superficie); border: 1px solid var(--linea); box-shadow: var(--s3);
-  }
-  .acciones.abierto .pestanas { flex-direction: column; margin: 0; background: transparent; padding: 0; gap: 2px; }
-  .acciones.abierto .pestanas button { justify-content: flex-start; padding: 10px 12px; font-size: 15px; }
-  .acciones.abierto .pestanas button[aria-selected="true"] { background: var(--acento-suave); color: var(--acento); }
-  .acciones.abierto .btn.primario { justify-content: center; padding: 11px; }
 
   /* Contexto: una sola línea que se desliza al costado. */
   .barra-contexto {
@@ -622,18 +611,36 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .barra-contexto::-webkit-scrollbar { display: none; }
   .barra-contexto > * { flex-shrink: 0; }
   .barra-contexto .saltos { margin-right: 0; flex-wrap: nowrap; }
+  .barra-contexto { padding-left: 10px; padding-right: 10px; }
+  .ruta-prefijo { display: none; }
   .controles-gen { display: none; }
+  /* Las dos acciones de la ficha se dicen cortas: "Ver ficha" y "Editar" ya
+     ocupan lo que el celular tiene. */
+  .barra-contexto .btn.chico { padding: 5px 9px; }
 
   /* El árbol se queda con toda la pantalla. */
   .contenido { flex-direction: column; min-height: 0; }
   .lienzo { flex: 1; min-height: 0; }
-  /* Compactos y translúcidos: en el celular cada píxel de árbol cuenta. */
-  .controles-lienzo { top: 10px; right: 10px; bottom: auto; gap: 4px; }
-  .controles-lienzo .btn {
-    padding: 6px 9px; font-size: 12px; min-width: 34px;
-    background: color-mix(in srgb, var(--superficie) 88%, transparent);
-    backdrop-filter: blur(6px);
+  /* Una fila arriba a la derecha, no una columna: apilados se comían un cuarto
+     del alto del árbol, que es justo lo que falta en un teléfono. */
+  .controles-lienzo {
+    top: 8px; right: 8px; bottom: auto; gap: 0;
+    flex-direction: row; align-items: center;
+    border-radius: 999px; overflow: hidden;
+    border: 1px solid var(--linea);
+    background: color-mix(in srgb, var(--superficie) 90%, transparent);
+    backdrop-filter: blur(8px); box-shadow: var(--s2);
   }
+  .controles-lienzo .btn {
+    padding: 0; min-width: 42px; height: 38px; font-size: 15px;
+    border: 0; border-radius: 0; box-shadow: none; background: transparent;
+  }
+  .controles-lienzo .btn + .btn { border-left: 1px solid var(--linea); }
+  /* Con poco ancho, los dos botones de encuadre se dicen con un ícono. */
+  .controles-lienzo .btn.texto-largo { font-size: 0; }
+  .controles-lienzo .btn.texto-largo::after { font-size: 16px; }
+  .controles-lienzo .btn[data-accion="entorno"]::after { content: "◎"; }
+  .controles-lienzo .btn[data-accion="todo"]::after { content: "⛶"; }
   .pista { display: none; }
 
   /* La ficha sube desde abajo y tapa el árbol sólo mientras se la mira. */
@@ -650,21 +657,90 @@ button, input, select, textarea { font: inherit; color: inherit; }
     background: var(--linea-fuerte);
   }
   .panel-cuerpo { padding: 12px 18px 32px; }
+  /* La ficha entra por abajo y el alto es lo escaso: el retrato se achica y el
+     nombre se pone a su lado en vez de debajo. Antes la cabecera sola se comía
+     un tercio de la hoja y había que bajar para ver un dato. */
+  .panel .retrato.grande { width: 74px; height: 74px; font-size: 24px; }
+  .panel .ficha-cabecera { gap: 12px; align-items: center; }
+  .panel .ficha-cabecera h2 { font-size: 19px !important; }
+  .panel .visor-tiras { max-width: 74px; }
   .cerrar-panel { width: 34px; height: 34px; }
 
-  .hoja { padding: 16px 14px 48px; }
+  .hoja { padding: 16px 14px calc(var(--barra-abajo) + 40px); }
+
+  /* ---- Personas: en el celular ésta es la mesa de trabajo ----
+     Se carga y se corrige desde acá, no desde el árbol: en una pantalla chica
+     apuntarle a una tarjeta del lienzo y abrirle la ficha es incómodo, y la
+     lista tiene buscador, filtros y todas las fichas al alcance. */
+  .rejilla { grid-template-columns: 1fr; gap: 8px; }
+  .tarjeta-abrir { padding: 10px 12px; gap: 11px; }
+  .tarjeta .retrato { width: 40px; height: 40px; font-size: 14px; }
+  .tarjeta .met { font-size: 12px; }
+  .tarjeta-editar { display: grid; place-items: center; width: 26px; flex-shrink: 0; margin-left: auto; color: var(--tinta-tenue); }
+  .tarjeta-arbol { width: 46px; }
+
+  /* El orden de la pestaña Personas se da vuelta: primero buscar y la lista
+     —que es a lo que se entra— y después las métricas, las puntas abiertas y
+     las descargas. Antes había que pasar cinco tarjetas y una lista larga para
+     llegar al buscador. */
+  .hoja-personas .hoja-ancho { display: flex; flex-direction: column; }
+  .hoja-personas .hoja-ancho > * { order: 4; }
+  .hoja-personas .buscador-personas { order: 1; margin-top: 0 !important; position: sticky; top: 0; z-index: 3;
+    background: var(--fondo); padding: 8px 0; }
+  .hoja-personas .rejilla, .hoja-personas .lista-vacia { order: 2; }
+  .hoja-personas .metricas { order: 3; margin-top: 18px; }
+
+  .barra-busqueda { gap: 8px; }
+  .barra-busqueda .campo-texto { min-width: 0; flex: 1 1 100%; }
+  .barra-busqueda select { flex: 1 1 auto; }
+  .barra-busqueda .btn.primario { flex: 1 1 auto; justify-content: center; }
+  .metricas { gap: 8px; }
   .modal { max-height: 92dvh; }
   .telon { padding: 0; align-items: flex-end; }
   .modal { border-radius: var(--r-lg) var(--r-lg) 0 0; width: 100%; }
+
+  /* ---- Barra de secciones, abajo ---- */
+  .pestanas-abajo {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 46;
+    background: color-mix(in srgb, var(--superficie) 94%, transparent);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--linea);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pestanas-abajo button {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    min-height: 54px; padding: 7px 4px 8px;
+    border: 0; background: transparent; cursor: pointer;
+    font-size: 11px; font-weight: 600; letter-spacing: .01em;
+    color: var(--tinta-tenue);
+  }
+  .pestanas-abajo button[aria-selected="true"] { color: var(--acento); }
+  .pestanas-abajo .globo {
+    position: absolute; top: 4px; left: 50%; margin-left: 5px;
+    min-width: 17px; padding: 0 4px; border-radius: 999px;
+    font-size: 10.5px; line-height: 17px; text-align: center;
+    background: var(--acento); color: var(--acento-texto);
+  }
+
+  /* El árbol y la ficha terminan arriba de la barra, no debajo. */
+  .contenido { padding-bottom: var(--barra-abajo); }
+  .panel { bottom: var(--barra-abajo); max-height: calc(74dvh - var(--barra-abajo)); }
+  .telon { padding-bottom: 0; }
 }
 
 /* En pantallas chicas los carteles no pueden comerse la primera pantalla:
    queda el titular y el detalle se lee tocando "Ver más". */
 @media (max-width: 720px) {
-  .aviso { padding: 8px 12px; font-size: 12.5px; line-height: 1.45; }
+  .aviso { padding: 7px 12px; font-size: 12.5px; line-height: 1.4; gap: 8px; }
   .aviso-detalle { display: none; }
   .aviso.abierto .aviso-detalle { display: inline; }
   .marca h1 { font-size: 15px; }
+  /* Justificar un cartel de tres líneas en una pantalla angosta abre huecos
+     enormes entre palabras. El texto largo del sitio sigue justificado; este
+     cartel es interfaz, no cuerpo de texto. */
+  .aviso .prosa { text-align: left; }
 }
 @media (min-width: 721px) {
   .aviso .ver-mas { display: none; }
@@ -918,4 +994,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
      bajan debajo del nombre. */
   .fila-check { grid-template-columns: auto 1fr; }
   .fila-check .met { grid-column: 2; white-space: normal; }
+}
+
+/* La barra de secciones es sólo del celular: en pantalla grande están las
+   pestañas del encabezado. Va en su propia consulta y no como regla suelta:
+   suelta al final del archivo le ganaría por orden a la del bloque móvil. */
+@media (min-width: 901px) {
+  .pestanas-abajo { display: none; }
 }
