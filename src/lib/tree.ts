@@ -63,13 +63,42 @@ export function lineaVida(p: Persona): string {
   return "falleció";
 }
 
-/** Edad actual, o edad al fallecer. `null` si falta la fecha de nacimiento. */
+/** Año, mes y día de una fecha parcial; mes y día pueden faltar. */
+function partes(f?: FechaParcial): { a: number; m?: number; d?: number } | null {
+  const a = anio(f);
+  if (a === null) return null;
+  const [, m, d] = (f ?? "").split("-");
+  return { a, m: m ? Number(m) : undefined, d: d ? Number(d) : undefined };
+}
+
+/**
+ * Edad actual, o edad al fallecer. `null` si falta la fecha de nacimiento.
+ *
+ * Restar los años a secas da uno de más durante casi todo el año: quien nació
+ * en noviembre de 1975 tiene 50 hasta noviembre, no 51. Se resta el año que
+ * falta cuando el cumpleaños todavía no llegó.
+ *
+ * Con fechas incompletas se elige la edad **menor**: si sólo se sabe el mes y
+ * es justo este, el cumpleaños puede no haber pasado, y es preferible quedarse
+ * corto que envejecer a alguien. Sabiendo sólo el año no hay nada que decidir.
+ */
 export function edad(p: Persona): number | null {
-  const nace = anio(p.fechaNacimiento);
-  if (nace === null) return null;
-  const corte = p.vivo ? new Date().getFullYear() : anio(p.fechaFallecimiento);
-  if (corte === null) return null;
-  return corte - nace;
+  const nace = partes(p.fechaNacimiento);
+  if (!nace) return null;
+
+  const hoy = new Date();
+  const corte = p.vivo
+    ? { a: hoy.getFullYear(), m: hoy.getMonth() + 1, d: hoy.getDate() }
+    : partes(p.fechaFallecimiento);
+  if (!corte) return null;
+
+  let años = corte.a - nace.a;
+  if (nace.m && corte.m) {
+    const cumplio =
+      corte.m > nace.m || (corte.m === nace.m && (corte.d ?? 0) >= (nace.d ?? 32));
+    if (!cumplio) años -= 1;
+  }
+  return años < 0 ? null : años;
 }
 
 export function ordenarPorNacimiento(personas: Persona[]): Persona[] {
