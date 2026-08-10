@@ -417,6 +417,33 @@ Detalles que importan:
 El correo sale por el **SMTP de DAS Latam** (Ferozo); las credenciales van por
 variables de entorno, nunca al repositorio.
 
+## Quién es quién mientras se carga
+
+**El nombre se pregunta una sola vez**, la primera, y queda en ese navegador. No
+es un login: sirve para que cada ficha diga quién la cargó y quién la corrigió, y
+para la lista de conectados. El campo ofrece los nombres ya cargados, porque
+quien entra suele estar en el árbol.
+
+**Un globo en la barra** cuenta cuánta gente está mirando; al tocarlo dice
+quiénes. La presencia se lleva **en memoria del servidor** (`presencia.ts`), no
+en el árbol: con el JSON guardado en GitHub, anotar cada latido sería un commit
+cada veinte segundos por persona. Es información que se vence sola y no merece
+historial. Si el sitio corriera en varias instancias a la vez, cada una vería
+sólo a los suyos y el número saldría bajo — el error posible es contar de menos,
+nunca inventar gente.
+
+### Dos personas guardando a la vez
+
+- **Por ficha**: el navegador manda `actualizadoEn`, la versión que tenía a la
+  vista, y el servidor responde 409 si otro tocó esa misma ficha mientras tanto.
+  No se pierde lo escrito —el formulario queda abierto—, se adopta la versión
+  nueva y el segundo intento entra.
+- **Por archivo**: con el árbol en GitHub, la Contents API exige el `sha` de la
+  versión leída; ante un choque se relee y se reintenta.
+- **Al mirar**: el mismo latido trae la revisión del árbol, así que cuando otro
+  guarda algo se recarga solo — salvo que haya un formulario abierto, para no
+  pisar lo que se está escribiendo.
+
 ## Nadie borra
 
 Mientras el árbol esté abierto **no se puede eliminar nada**, ni siquiera desde

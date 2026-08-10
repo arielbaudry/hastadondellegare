@@ -93,6 +93,16 @@ hay que aflojar:
 3. **La firma no alcanza**: al entrar y en cada `/api/arbol` se verifica que el
    correo siga en alguna ficha. Si no, la sesión se cae.
 
+## Presencia y concurrencia
+
+- La presencia va **en memoria** (`src/lib/presencia.ts`). No moverla al
+  almacenamiento del árbol: sería un commit por latido.
+- El bloqueo optimista por ficha se apoya en que `PersonaEntrada` incluya
+  `actualizadoEn`. Si se saca ese campo, dos personas editando la misma ficha
+  vuelven a pisarse en silencio.
+- Tras un conflicto hay que **adoptar la versión nueva** (`versionAlDia`), si no
+  el reintento choca para siempre contra el mismo 409.
+
 ## Nadie borra
 
 Eliminar personas, importar respaldos y sembrar el ejemplo exigen `ADMIN_CLAVE`
