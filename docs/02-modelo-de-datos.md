@@ -21,6 +21,24 @@ Persona {
 **Sólo se guardan dos vínculos: `padres` y `parejas`.** Hijos, nietos, hermanos,
 abuelos, tíos, primos y sobrinos se *derivan* en `src/lib/tree.ts`.
 
+Que no se guarden no quiere decir que no se puedan cargar. El formulario los
+pide igual, y los traduce a los dos campos que sí existen:
+
+| Lo que se elige en el formulario | Lo que se guarda |
+| --- | --- |
+| `hijos: string[]` | esta persona entra (o sale) del campo `padres` de cada hijo |
+| `hermanosDe: string[]` | esta ficha y esas personas quedan con los mismos padres |
+
+Ninguno de los dos llega al servidor: `guardar()` en `App.tsx` los saca de la
+entrada y los aplica como ediciones de las otras fichas. Los dos tienen reglas
+que se revisan **antes de escribir nada**, porque guardar la mitad dejaría la
+ficha en pantalla desactualizada:
+
+- nadie puede tener más de dos padres;
+- un ascendente no puede ser además hijo (`esAscendente()` corta el ciclo);
+- a un hermano que ya tenga otros padres cargados no se le pisan: se respetan
+  los suyos, que el dato de otro no se borra.
+
 Así es imposible que quede una relación a medias del tipo «A dice ser hijo de B
 pero B no lista a A». No agregar campos de relación redundantes.
 

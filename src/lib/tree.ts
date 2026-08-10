@@ -93,6 +93,24 @@ export function hijosDe(id: string, personas: Persona[]): Persona[] {
   return ordenarPorNacimiento(personas.filter((p) => p.padres.includes(id)));
 }
 
+/**
+ * ¿`candidato` está entre los ascendentes de `de`? Sirve para no dejar que
+ * alguien quede como hijo de su propio nieto. Corta ciclos por las dudas: si el
+ * árbol ya tuviera uno, esto no debe colgarse.
+ */
+export function esAscendente(candidato: string, de: string, ix: Indice): boolean {
+  const vistos = new Set<string>();
+  const pila = [...(ix.get(de)?.padres ?? [])];
+  while (pila.length) {
+    const id = pila.pop()!;
+    if (id === candidato) return true;
+    if (vistos.has(id)) continue;
+    vistos.add(id);
+    pila.push(...(ix.get(id)?.padres ?? []));
+  }
+  return false;
+}
+
 export function parejasDe(id: string, ix: Indice): Persona[] {
   const p = ix.get(id);
   if (!p) return [];

@@ -3,7 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import CampoFecha from "@/components/CampoFecha";
 import FotosInput from "@/components/FotosInput";
-import { nombreCompleto, ordenarPorNacimiento, anio } from "@/lib/tree";
+import {
+  nombreCompleto,
+  ordenarPorNacimiento,
+  anio,
+  hijosDe,
+  hermanosDe as hermanosDerivados,
+  indexar,
+} from "@/lib/tree";
 import type { TipoVinculo } from "@/components/FichaPersona";
 import type { Pareja, Persona, PersonaEntrada, TipoPareja } from "@/lib/types";
 
@@ -70,6 +77,9 @@ export default function FormularioPersona({
           padres: [...persona.padres],
           parejas: persona.parejas.map((v) => ({ ...v })),
           fotos: [...(persona.fotos ?? [])],
+          // Los hijos no son un campo de esta ficha: se deducen de los padres de
+          // cada uno. Se traen a la vista para poder elegirlos y quitarlos acá.
+          hijos: hijosDe(persona.id, personas).map((p) => p.id),
         } as PersonaEntrada)
       : vacia(inicial),
   );
@@ -95,6 +105,52 @@ export default function FormularioPersona({
 
   const padres = d.padres ?? [];
   const parejas = d.parejas ?? [];
+  const hijos = d.hijos ?? [];
+  const hermanos = d.hermanosDe ?? [];
+
+  /** Los que ya se deducen de los padres cargados: se muestran, no se piden. */
+  const hermanosYa = useMemo(
+    () => (persona ? hermanosDerivados(persona.id, personas, indexar(personas)) : []),
+    [persona, personas],
+  );
+
+  /** Cambia una fila de una lista de ids; vacío la saca. */
+  function ponerEnLista(k: "hijos" | "hermanosDe", i: number, id: string) {
+    const lista = [...(d[k] ?? [])];
+    if (id) lista[i] = id;
+    else lista.splice(i, 1);
+    campo(k, [...new Set(lista.filter(Boolean))]);
+  }
+
+  /** Los dos botones que cierran cada sección de vínculos. */
+  function Acciones({ tipo, elegir }: { tipo: TipoVinculo; elegir?: () => void }) {
+    const nuevo = {
+      padre: "+ Crear padre / madre",
+      hijo: "+ Crear hijo / hija",
+      hermano: "+ Crear hermano / hermana",
+      pareja: "+ Crear pareja",
+    }[tipo];
+    return (
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+        {elegir && (
+          <button type="button" className="btn chico" onClick={elegir}>
+            + Elegir de la lista
+          </button>
+        )}
+        {persona && onAgregar && (
+          <button
+            type="button"
+            className="btn chico"
+            disabled={guardando}
+            title="Crea la ficha nueva y deja el vínculo hecho de los dos lados"
+            onClick={() => onAgregar(tipo, d)}
+          >
+            {nuevo}
+          </button>
+        )}
+      </div>
+    );
+  }
 
   function ponerPadre(i: number, id: string) {
     const nuevos = [...padres];
@@ -264,10 +320,10 @@ export default function FormularioPersona({
           </div>
 
           <div className="seccion-form">
-            <h3>Ascendentes</h3>
+            <h3>Ascendentes · padre y madre</h3>
             <p>
-              Elegí padre y madre entre las personas ya cargadas. Los hijos, hermanos, nietos,
-              tíos y primos no se cargan: se deducen solos a partir de esto.
+              Elegilos entre los ya cargados, o creá la ficha que falte. Nietos, tíos y primos
+              no se cargan: se deducen solos a partir de esto.
             </p>
             <div className="campos">
               {[0, 1].map((i) => (
@@ -288,37 +344,72 @@ export default function FormularioPersona({
                 </div>
               ))}
             </div>
+            <Acciones tipo="padre" />
           </div>
 
           <div className="seccion-form">
-            <h3>Laterales · hermanos</h3>
+            <h3>Descendentes · hijos e hijas</h3>
             <p>
-              Los hermanos salen de compartir padre o madre, así que no se cargan de a uno:
-              se elige a un hermano ya cargado y esta ficha pasa a tener sus mismos padres.
-              Si ese hermano tampoco los tiene, se crea la ficha que hace falta.
+              El vínculo se guarda en la ficha del hijo, así que elegirlo acá es lo mismo que
+              poner a esta persona como padre o madre allá. Vaciar una fila lo desvincula.
             </p>
             <div className="campos">
-              <div className="campo ancho">
-                <label htmlFor="f-hermano">Es hermano/a de</label>
-                <select
-                  id="f-hermano"
-                  value={d.hermanoDe ?? ""}
-                  onChange={(e) => campo("hermanoDe", e.target.value || undefined)}
-                >
-                  <option value="">— no cambiar —</option>
-                  {candidatos.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {etiqueta(p)}
-                    </option>
-                  ))}
-                </select>
-                {d.hermanoDe && (
-                  <span className="ayuda">
-                    Al guardar, esta ficha va a quedar con los mismos padres que esa persona.
-                  </span>
-                )}
-              </div>
+              {hijos.map((id, i) => (
+                <div className="campo" key={`${id}-${i}`}>
+                  <label htmlFor={`f-hijo-${i}`}>Hijo / hija {i + 1}</label>
+                  <select
+                    id={`f-hijo-${i}`}
+                    value={id}
+                    onChange={(e) => ponerEnLista("hijos", i, e.target.value)}
+                  >
+                    <option value="">— quitar —</option>
+                    {candidatos.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {etiqueta(p)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
             </div>
+            {!hijos.length && <p className="ayuda">Todavía no tiene hijos cargados.</p>}
+            <Acciones tipo="hijo" elegir={() => campo("hijos", [...hijos, ""])} />
+          </div>
+
+          <div className="seccion-form">
+            <h3>Laterales · hermanos y hermanas</h3>
+            <p>
+              Ser hermanos es compartir padre o madre, así que no se guarda de a uno: al elegir
+              a alguien acá, esta ficha y esa persona quedan con los mismos padres. Si ninguna
+              los tiene cargados, se crea la ficha que hace falta; si esa persona ya tiene otros,
+              se respetan los suyos.
+            </p>
+            {hermanosYa.length > 0 && (
+              <p className="ayuda">
+                Ya figuran como hermanos: {hermanosYa.map((p) => nombreCompleto(p)).join(", ")}. Para
+                sacar a alguno, corregí los padres.
+              </p>
+            )}
+            <div className="campos">
+              {hermanos.map((id, i) => (
+                <div className="campo" key={`${id}-${i}`}>
+                  <label htmlFor={`f-hermano-${i}`}>Es hermano/a de</label>
+                  <select
+                    id={`f-hermano-${i}`}
+                    value={id}
+                    onChange={(e) => ponerEnLista("hermanosDe", i, e.target.value)}
+                  >
+                    <option value="">— quitar —</option>
+                    {candidatos.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {etiqueta(p)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+            <Acciones tipo="hermano" elegir={() => campo("hermanosDe", [...hermanos, ""])} />
           </div>
 
           <div className="seccion-form">
@@ -356,43 +447,20 @@ export default function FormularioPersona({
                 </div>
               </div>
             ))}
-            <button
-              type="button"
-              className="btn chico"
-              onClick={() => campo("parejas", [...parejas, { personaId: "", tipo: "pareja" as TipoPareja }])}
-            >
-              + Agregar pareja
-            </button>
+            {!parejas.length && <p className="ayuda">Todavía no tiene pareja cargada.</p>}
+            <Acciones
+              tipo="pareja"
+              elegir={() =>
+                campo("parejas", [...parejas, { personaId: "", tipo: "pareja" as TipoPareja }])
+              }
+            />
           </div>
 
           {persona && onAgregar && (
-            <div className="seccion-form">
-              <h3>Sumar familia</h3>
-              <p>
-                Crea la persona y deja el vínculo hecho de los dos lados. Se guardan primero
-                los cambios de esta ficha.
-              </p>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {(
-                  [
-                    ["padre", "+ Padre / madre"],
-                    ["pareja", "+ Pareja"],
-                    ["hijo", "+ Hijo / hija"],
-                    ["hermano", "+ Hermano / hermana"],
-                  ] as [TipoVinculo, string][]
-                ).map(([tipo, etiqueta]) => (
-                  <button
-                    key={tipo}
-                    type="button"
-                    className="btn chico"
-                    disabled={guardando}
-                    onClick={() => onAgregar(tipo, d)}
-                  >
-                    {etiqueta}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <p className="ayuda" style={{ marginTop: 14 }}>
+              Los botones «Crear…» guardan primero lo que escribiste acá y después abren la ficha
+              nueva, con el vínculo ya hecho de los dos lados.
+            </p>
           )}
 
           <div className="seccion-form">

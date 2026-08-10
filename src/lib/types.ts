@@ -112,8 +112,15 @@ export type PersonaEntrada = Omit<
   id?: string;
   actualizadoEn?: string;
   /**
-   * No se guarda: es una instrucción del formulario. Al guardar, esta ficha
-   * adopta los padres de esa persona, que es lo que los vuelve hermanos.
+   * No se guarda: es una instrucción del formulario. Al guardar, esta ficha y
+   * esas personas quedan con los mismos padres, que es lo que las vuelve
+   * hermanas. Si alguna ya tiene otros cargados, se respetan los suyos.
    */
-  hermanoDe?: string;
+  hermanosDe?: string[];
+  /**
+   * Tampoco se guarda acá: los hijos viven en el campo `padres` de cada hijo.
+   * Es la lista completa deseada, y al guardar se agrega o se quita esta
+   * persona de los padres de cada uno para que quede así.
+   */
+  hijos?: string[];
 };

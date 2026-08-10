@@ -10,10 +10,12 @@ y todavía no tienen padres cargados— como lista de lo que falta averiguar.
 ## Cómo se carga
 
 1. **Empezá por vos.** Después, desde tu ficha, «+ Padre / madre».
-2. Cada persona nueva se crea **desde el modal de edición de otra**, con los
-   botones de *Sumar familia*. Así el vínculo queda hecho de los dos lados sin
-   que haya que acordarse de nada. Esos botones guardan primero lo que estés
-   editando y recién después abren la ficha nueva.
+2. El modal de edición tiene **una sección por tipo de vínculo** —ascendentes,
+   descendentes, hermanos, pareja— y todas funcionan igual: se **elige de la
+   lista** a alguien que ya esté cargado, o se **crea** la ficha nueva ahí mismo.
+
+   Los botones «Crear…» guardan primero lo que estés editando y recién después
+   abren la ficha nueva, con el vínculo hecho de los dos lados.
 
    La ficha del costado es sólo para mirar: datos, contacto y linaje. Para
    operar sobre una persona se entra a *Editar*.

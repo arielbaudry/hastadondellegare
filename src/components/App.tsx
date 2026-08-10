@@ -35,6 +35,7 @@ import {
   type Sesion,
 } from "@/lib/cliente";
 import {
+  esAscendente,
   hijosDe,
   indexar,
   nombreCompleto,
@@ -271,41 +272,149 @@ export default function App() {
     setEdicion({ modo: "crear", vinculo: { tipo, base: alDia } });
   }
 
+  /**
+   * Qué padres van a compartir esta ficha y los hermanos que se eligieron.
+   * Manda lo que ya tenga cargado la ficha; si no tiene, se adoptan los del
+   * primer hermano que sí. Si ninguno tiene, hace falta crear la ficha del
+   * padre o la madre aunque no se sepa el nombre: sin nadie en común no hay
+   * manera de deducir la hermandad. Queda como punta abierta del árbol.
+   */
+  async function padresParaHermanar(
+    elegidos: string[],
+    datos: PersonaEntrada,
+    propios: string[],
+  ): Promise<string[]> {
+    if (propios.length) return propios;
+
+    for (const id of elegidos) {
+      const h = personas.find((p) => p.id === id);
+      if (h?.padres.length) return [...h.padres];
+    }
+
+    const primero = personas.find((p) => p.id === elegidos[0]);
+    const quienes = [primero ? nombreCompleto(primero) : "esa persona", `${datos.nombres} ${datos.apellidos}`];
+    const marcador = await crearPersona(
+      {
+        nombres: "Padre o madre",
+        apellidos: primero?.apellidos ?? datos.apellidos,
+        vivo: false,
+        fotos: [],
+        padres: [],
+        parejas: [],
+        notas: `Ficha creada para vincular como hermanos a ${quienes.join(" y ")}. Completá el nombre cuando lo sepan.`,
+      },
+      autor,
+    );
+    return [marcador.persona.id];
+  }
+
+  /**
+   * Le pasa esos padres a cada hermano elegido que no tenga ninguno. A los que
+   * ya tienen otros cargados no se los toca: pisarlos borraría el trabajo de
+   * quien los cargó, y acá nadie borra datos de otro.
+   */
+  async function propagarHermanos(
+    elegidos: string[],
+    padres: string[],
+    lista: Persona[],
+  ): Promise<Persona[]> {
+    if (!elegidos.length || !padres.length) return lista;
+    let actual = lista;
+    for (const id of elegidos) {
+      const h = actual.find((p) => p.id === id);
+      if (!h || h.padres.length) continue;
+      actual = (await editarPersona(id, { padres }, autor)).personas;
+    }
+    return actual;
+  }
+
+  /**
+   * Los hijos que se sumaron y los que se sacaron. `padreId` es null en un alta:
+   * la persona todavía no existe.
+   */
+  function cambioDeHijos(padreId: string | null, deseados: string[], lista: Persona[]) {
+    const quiero = [...new Set(deseados.filter(Boolean))];
+    const tiene = padreId ? hijosDe(padreId, lista).map((p) => p.id) : [];
+    return {
+      sumar: quiero.filter((id) => !tiene.includes(id)),
+      sacar: tiene.filter((id) => !quiero.includes(id)),
+    };
+  }
+
+  /**
+   * Se revisa **antes de escribir nada**. Si un caso no da, tiene que no entrar
+   * ninguno: guardar la mitad dejaría la ficha en pantalla desactualizada y el
+   * siguiente intento chocaría contra su propia versión vieja.
+   */
+  function revisarHijos(padreId: string | null, deseados: string[], lista: Persona[]): void {
+    const { sumar } = cambioDeHijos(padreId, deseados, lista);
+    const ix = indexar(lista);
+    for (const id of sumar) {
+      const h = lista.find((p) => p.id === id);
+      if (!h) continue;
+      if (h.padres.length >= 2) {
+        throw new Error(
+          `${nombreCompleto(h)} ya tiene cargados padre y madre. Quitá uno en su ficha antes de sumarla acá.`,
+        );
+      }
+      if (padreId && esAscendente(id, padreId, ix)) {
+        throw new Error(
+          `${nombreCompleto(h)} es ascendente de esta persona: no puede ser también su hijo/a.`,
+        );
+      }
+    }
+  }
+
+  /**
+   * Deja los hijos de alguien exactamente como quedaron en el formulario. El
+   * vínculo no vive acá sino en el campo `padres` de cada hijo, así que se
+   * agrega o se saca de cada uno de ellos.
+   */
+  async function aplicarHijos(
+    padreId: string,
+    deseados: string[],
+    lista: Persona[],
+  ): Promise<Persona[]> {
+    const { sumar, sacar } = cambioDeHijos(padreId, deseados, lista);
+    if (!sumar.length && !sacar.length) return lista;
+
+    let actual = lista;
+    for (const id of sumar) {
+      const h = actual.find((p) => p.id === id);
+      if (!h) continue;
+      actual = (await editarPersona(id, { padres: [...h.padres, padreId] }, autor)).personas;
+    }
+    for (const id of sacar) {
+      const h = actual.find((p) => p.id === id);
+      if (!h) continue;
+      actual = (await editarPersona(id, { padres: h.padres.filter((x) => x !== padreId) }, autor)).personas;
+    }
+    return actual;
+  }
+
   async function guardar(entrada: PersonaEntrada, opciones: { cerrar?: boolean } = {}) {
     setGuardando(true);
     setErrorForm(null);
     setVersionAlDia(undefined);
     try {
-      // "Es hermano/a de X" es una instrucción, no un campo: se traduce a
-      // compartir los padres de X, creando la ficha que falte si X tampoco los
-      // tiene cargados.
-      const { hermanoDe, ...datos } = entrada;
-      if (hermanoDe) {
-        const hermano = personas.find((p) => p.id === hermanoDe);
-        if (hermano) {
-          let padres = [...hermano.padres];
-          if (!padres.length) {
-            const m = await crearPersona(
-              {
-                nombres: "Padre o madre",
-                apellidos: hermano.apellidos,
-                vivo: false,
-                fotos: [],
-                padres: [],
-                parejas: [],
-                notas: `Ficha creada para vincular como hermanos a ${nombreCompleto(hermano)} y ${datos.nombres} ${datos.apellidos}. Completá el nombre cuando lo sepan.`,
-              },
-              autor,
-            );
-            await editarPersona(hermano.id, { padres: [m.persona.id] }, autor);
-            padres = [m.persona.id];
-          }
-          datos.padres = padres;
-        }
+      // Hermanos e hijos no son campos de esta ficha: son instrucciones del
+      // formulario. Se traducen antes de guardar —los hermanos, a compartir
+      // padres— y después —los hijos, al campo `padres` de cada hijo—.
+      const { hermanosDe, hijos, ...datos } = entrada;
+      const elegidos = (hermanosDe ?? []).filter(Boolean);
+      if (hijos) {
+        revisarHijos(edicion?.modo === "editar" ? edicion.persona.id : null, hijos, personas);
+      }
+      if (elegidos.length) {
+        datos.padres = await padresParaHermanar(elegidos, datos, [...(datos.padres ?? [])]);
       }
       if (edicion?.modo === "editar") {
-        const res = await editarPersona(edicion.persona.id, datos, autor);
-        aplicar(res.personas);
+        const yo = edicion.persona.id;
+        const res = await editarPersona(yo, datos, autor);
+        let lista = res.personas;
+        lista = await propagarHermanos(elegidos, datos.padres ?? [], lista);
+        if (hijos) lista = await aplicarHijos(yo, hijos, lista);
+        aplicar(lista);
       } else if (edicion?.modo === "crear") {
         const v = edicion.vinculo;
 
@@ -344,6 +453,9 @@ export default function App() {
           lista = (await editarPersona(v.base.id, { padres }, autor)).personas;
         }
 
+        lista = await propagarHermanos(elegidos, datos.padres ?? [], lista);
+        if (hijos) lista = await aplicarHijos(res.persona.id, hijos, lista);
+
         aplicar(lista);
         irA(res.persona.id, { verArbol: false });
       }
@@ -362,6 +474,19 @@ export default function App() {
         );
       } else {
         setErrorForm(e instanceof Error ? e.message : "No se pudo guardar.");
+        // Puede haber fallado a mitad de camino —la ficha guardada y el vínculo
+        // con un pariente no—. Se recarga el árbol y se adopta la versión al
+        // día para que el segundo intento no choque contra la propia.
+        if (edicion?.modo === "editar") {
+          const yo = edicion.persona.id;
+          traerArbol()
+            .then((d) => {
+              setPersonas(d.personas);
+              const alDia = d.personas.find((p) => p.id === yo);
+              if (alDia) setVersionAlDia(alDia.actualizadoEn);
+            })
+            .catch(() => {});
+        }
       }
       return false;
     } finally {
@@ -862,6 +987,14 @@ export default function App() {
 
       {edicion && (
         <FormularioPersona
+          // Una ficha, un formulario. Sin esto React reusa el mismo y se
+          // arrastra lo que había cargado para la persona anterior: pasar de
+          // editar a "+ Crear hijo/a" abría el alta con los vínculos del padre.
+          key={
+            edicion.modo === "editar"
+              ? edicion.persona.id
+              : `nuevo:${edicion.vinculo?.tipo ?? ""}:${edicion.vinculo?.base.id ?? ""}`
+          }
           persona={edicion.modo === "editar" ? edicion.persona : null}
           personas={personas}
           titulo={tituloForm}
