@@ -884,3 +884,38 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .bitacora .accion.alta { color: var(--vivo); font-weight: 600; }
 .bitacora .accion.baja { color: var(--alerta); font-weight: 600; }
 .bitacora .detalle { color: var(--tinta); font-weight: 550; }
+
+/* Listas con checkbox que pueden ser largas —a quién me llevo al teléfono—.
+   Van en una caja con scroll propio: si crecen sueltas, estiran la hoja
+   entera y la pantalla queda impracticable. */
+.caja-lista {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: var(--fondo-suave, transparent);
+}
+
+.fila-check {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--borde);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.fila-check:last-child { border-bottom: 0; }
+.fila-check:hover { background: var(--fondo-hover, rgba(127, 127, 127, 0.07)); }
+.fila-check input { width: auto; margin: 0; }
+.fila-check .quien { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fila-check .met { color: var(--tinta-tenue); font-size: 12.5px; white-space: nowrap; }
+
+@media (max-width: 620px) {
+  /* En el celular no entran cuatro columnas: el parentesco y el detalle
+     bajan debajo del nombre. */
+  .fila-check { grid-template-columns: auto 1fr; }
+  .fila-check .met { grid-column: 2; white-space: normal; }
+}

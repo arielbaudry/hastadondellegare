@@ -1,6 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { ARBOL_VACIO, type Arbol, type Movimiento, type Persona } from "./types";
+import { nombreCanonico } from "./coincidencias";
 import {
   ConflictoDeVersion,
   escribirArchivo,
@@ -167,15 +168,46 @@ let cola: Promise<unknown> = Promise.resolve();
  */
 const MAX_BITACORA = 300;
 
+/** Cuántos movimientos firmó cada nombre. Sirve para desempatar homónimos. */
+function actividadEn(arbol: Arbol): Map<string, number> {
+  const cuenta = new Map<string, number>();
+  for (const m of arbol.bitacora ?? []) cuenta.set(m.quien, (cuenta.get(m.quien) ?? 0) + 1);
+  return cuenta;
+}
+
 /** Suma un movimiento a la bitácora del árbol, podando lo más viejo. */
 export function anotar(arbol: Arbol, m: Omit<Movimiento, "cuando">): void {
   if (!Array.isArray(arbol.bitacora)) arbol.bitacora = [];
-  arbol.bitacora.unshift({ cuando: new Date().toISOString(), ...m });
+  arbol.bitacora.unshift({
+    cuando: new Date().toISOString(),
+    ...m,
+    quien: nombreCanonico(m.quien, arbol.personas, actividadEn(arbol)),
+  });
   arbol.bitacora = arbol.bitacora.slice(0, MAX_BITACORA);
 }
 
 function migrar(arbol: Arbol): void {
   if (!Array.isArray(arbol.bitacora)) arbol.bitacora = [];
+  // Movimientos viejos firmados de distintas maneras por la misma persona. Se
+  // resuelve una vez por nombre distinto —son un puñado— y no 300 veces.
+  //
+  // Dos pasadas: la primera resuelve los nombres que no dejan dudas y así se
+  // sabe quiénes editan de verdad; con eso, la segunda puede desempatar los
+  // ambiguos ("Ariel", habiendo dos Arieles en la familia).
+  const distintos = new Map<string, number>();
+  for (const m of arbol.bitacora) distintos.set(m.quien, (distintos.get(m.quien) ?? 0) + 1);
+
+  const actividad = new Map<string, number>();
+  for (const [nombre, cuantos] of distintos) {
+    const bueno = nombreCanonico(nombre, arbol.personas);
+    actividad.set(bueno, (actividad.get(bueno) ?? 0) + cuantos);
+  }
+
+  const resueltos = new Map<string, string>();
+  for (const nombre of distintos.keys()) {
+    resueltos.set(nombre, nombreCanonico(nombre, arbol.personas, actividad));
+  }
+  for (const m of arbol.bitacora) m.quien = resueltos.get(m.quien) ?? m.quien;
   for (const p of arbol.personas as (Persona & { fotoUrl?: string })[]) {
     if (!Array.isArray(p.fotos)) p.fotos = p.fotoUrl ? [p.fotoUrl] : [];
     delete p.fotoUrl;

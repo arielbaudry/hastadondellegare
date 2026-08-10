@@ -101,3 +101,40 @@ export function esInequivoca(c: Coincidencia[]): boolean {
   if (c.length === 1) return c[0].puntaje >= 0.85;
   return c[0].puntaje >= 0.98 && (c[1]?.puntaje ?? 0) <= 0.85;
 }
+
+/**
+ * El nombre con el que queda registrado quien edita. "Ariel", "Ariel Baudry" y
+ * "Ariel Osvaldo Baudry" son la misma persona, y en la bitácora tienen que
+ * figurar igual: si no, parecen tres.
+ *
+ * Es más permisivo que `esInequivoca()` a propósito. Ahí la pregunta es "¿te
+ * abro el árbol en esta ficha?" y equivocarse molesta; acá es sólo cómo se
+ * escribe un nombre en un registro. Ante la duda —dos personas igual de
+ * parecidas, un apellido suelto— se deja tal cual vino.
+ */
+export function nombreCanonico(
+  texto: string,
+  personas: Persona[],
+  /** Cuántos movimientos tiene ya cada nombre completo. Desempata. */
+  actividad?: Map<string, number>,
+): string {
+  const limpio = texto.trim();
+  const c = buscarPersona(limpio, personas);
+  if (!c.length) return limpio;
+
+  const [mejor, segundo] = c;
+  if (mejor.puntaje >= 0.6 && (!segundo || mejor.puntaje >= segundo.puntaje * 1.25)) {
+    return nombreCompleto(mejor.persona);
+  }
+
+  // Empate de verdad: en esta familia hay dos Arieles, y "Ariel" a secas se
+  // parece igual a los dos. Gana el que viene editando el árbol — quien nunca
+  // lo tocó no firmó ese movimiento. Si los dos editan, no hay manera de saber
+  // y el nombre queda como se escribió.
+  if (actividad?.size) {
+    const empatados = c.filter((x) => x.puntaje * 1.25 >= mejor.puntaje);
+    const activos = empatados.filter((x) => (actividad.get(nombreCompleto(x.persona)) ?? 0) > 0);
+    if (activos.length === 1) return nombreCompleto(activos[0].persona);
+  }
+  return limpio;
+}

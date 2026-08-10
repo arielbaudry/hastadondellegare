@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { nombreCompleto } from "@/lib/tree";
 import { leerClaveAdmin } from "@/lib/cliente";
 import type { EstadoAlmacenamiento, Movimiento, Permisos, Sesion } from "@/lib/cliente";
@@ -84,7 +84,15 @@ export default function Ajustes({
   const [clave, setClave] = useState("");
   const [probando, setProbando] = useState(false);
   const [avisoClave, setAvisoClave] = useState<string | null>(null);
+  const [verBitacora, setVerBitacora] = useState(false);
   const archivo = useRef<HTMLInputElement>(null);
+
+  /** Quiénes movieron el árbol y cuánto, del que más al que menos. */
+  const quienes = useMemo(() => {
+    const cuenta = new Map<string, number>();
+    for (const m of bitacora) cuenta.set(m.quien, (cuenta.get(m.quien) ?? 0) + 1);
+    return [...cuenta.entries()].sort((a, b) => b[1] - a[1]);
+  }, [bitacora]);
 
   useEffect(() => {
     setTema((window.localStorage.getItem("hdll:tema") as Tema) ?? "claro");
@@ -156,32 +164,61 @@ export default function Ajustes({
           ) : (
             <>
               <div className="chips" style={{ marginBottom: 12 }}>
-                {[...new Map(bitacora.map((m) => [m.quien, m])).keys()].slice(0, 12).map((quien) => (
+                {quienes.slice(0, 12).map(([quien, cuantos]) => (
                   <span className="pastilla" key={quien}>
-                    {quien} · {bitacora.filter((m) => m.quien === quien).length}
+                    {quien} · {cuantos}
                   </span>
                 ))}
               </div>
-              <ul className="bitacora">
-                {bitacora.slice(0, 40).map((m, i) => (
-                  <li key={`${m.cuando}-${i}`}>
-                    <span className="cuando">
-                      {new Date(m.cuando).toLocaleString("es-AR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                    <strong>{m.quien}</strong>
-                    <span className={`accion ${m.accion}`}>{ETIQUETA_ACCION[m.accion] ?? m.accion}</span>
-                    {m.detalle && <span className="detalle">{m.detalle}</span>}
-                  </li>
-                ))}
-              </ul>
+              {/* La lista entera no va acá: son cientos de líneas y estiran la
+                  pantalla de Ajustes hasta romperla. Se abre aparte. */}
+              <button className="btn" onClick={() => setVerBitacora(true)}>
+                Ver el registro ({bitacora.length})
+              </button>
             </>
           )}
         </div>
+
+        {verBitacora && (
+          <div className="telon" onMouseDown={(e) => e.target === e.currentTarget && setVerBitacora(false)}>
+            <div className="modal" role="dialog" aria-modal="true" aria-label="Quién hizo qué">
+              <header>
+                <h2>Quién hizo qué</h2>
+                <button className="btn chico fantasma" onClick={() => setVerBitacora(false)}>
+                  Cerrar
+                </button>
+              </header>
+              <div className="cuerpo">
+                <div className="chips" style={{ marginBottom: 14 }}>
+                  {quienes.map(([quien, cuantos]) => (
+                    <span className="pastilla" key={quien}>
+                      {quien} · {cuantos}
+                    </span>
+                  ))}
+                </div>
+                <ul className="bitacora">
+                  {bitacora.map((m, i) => (
+                    <li key={`${m.cuando}-${i}`}>
+                      <span className="cuando">
+                        {new Date(m.cuando).toLocaleString("es-AR", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      <strong>{m.quien}</strong>
+                      <span className={`accion ${m.accion}`}>
+                        {ETIQUETA_ACCION[m.accion] ?? m.accion}
+                      </span>
+                      {m.detalle && <span className="detalle">{m.detalle}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="seccion-form">
           <h3>Deshacer</h3>

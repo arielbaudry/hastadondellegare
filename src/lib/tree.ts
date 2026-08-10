@@ -94,6 +94,41 @@ export function hijosDe(id: string, personas: Persona[]): Persona[] {
 }
 
 /**
+ * A cuántos saltos está cada persona de otra, moviéndose por los vínculos que
+ * existen: padre, hijo, pareja. Un hermano está a 2 (subo al padre, bajo), un
+ * primo a 4. No es lo mismo que el parentesco —no distingue un abuelo de un
+ * nieto— pero contesta la pregunta práctica: qué tan lejos de mí está esta
+ * persona en el árbol.
+ */
+export function distanciasDesde(id: string, personas: Persona[]): Map<string, number> {
+  const ix = indexar(personas);
+  const hijos = new Map<string, string[]>();
+  for (const p of personas) {
+    for (const padre of p.padres) hijos.set(padre, [...(hijos.get(padre) ?? []), p.id]);
+  }
+
+  const distancia = new Map<string, number>([[id, 0]]);
+  let borde = [id];
+  let paso = 0;
+  while (borde.length) {
+    paso += 1;
+    const siguiente: string[] = [];
+    for (const actual of borde) {
+      const p = ix.get(actual);
+      if (!p) continue;
+      const vecinos = [...p.padres, ...(hijos.get(actual) ?? []), ...p.parejas.map((v) => v.personaId)];
+      for (const v of vecinos) {
+        if (distancia.has(v) || !ix.has(v)) continue;
+        distancia.set(v, paso);
+        siguiente.push(v);
+      }
+    }
+    borde = siguiente;
+  }
+  return distancia;
+}
+
+/**
  * ¿`candidato` está entre los ascendentes de `de`? Sirve para no dejar que
  * alguien quede como hijo de su propio nieto. Corta ciclos por las dudas: si el
  * árbol ya tuviera uno, esto no debe colgarse.

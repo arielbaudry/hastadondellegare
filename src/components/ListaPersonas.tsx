@@ -1,9 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Retrato from "@/components/Retrato";
-import { anio, lineaVida, metricas, nombreCompleto, ordenarPorNacimiento } from "@/lib/tree";
+import {
+  anio,
+  distanciasDesde,
+  indexar,
+  lineaVida,
+  metricas,
+  nombreCompleto,
+  ordenarPorNacimiento,
+} from "@/lib/tree";
+import { parentescoCon } from "@/lib/parentesco";
+import { contactosVcf, cumpleDe, cumplesIcs, descargarTexto, tieneContacto } from "@/lib/exportar";
 import type { Persona } from "@/lib/types";
+
+/** Hasta acá llega "la familia cercana": padres, hijos, hermanos, abuelos,
+ *  nietos, tíos, sobrinos y cuñados. Los primos quedan a 4 y se marcan a mano. */
+const CERCA = 3;
 
 type Filtro = "todos" | "vivos" | "fallecidos" | "sin-foto" | "sin-padres";
 
@@ -14,11 +28,14 @@ function normalizar(s: string): string {
 
 export default function ListaPersonas({
   personas,
+  miFichaId,
   onFoco,
   onEditar,
   onNueva,
 }: {
   personas: Persona[];
+  /** La ficha de quien está mirando: define qué es "cerca" en las descargas. */
+  miFichaId: string | null;
   /** Ir al árbol centrado en esa persona. */
   onFoco: (id: string) => void;
   /** Abrir la ficha para editarla: es la acción principal de la tarjeta. */
@@ -27,6 +44,7 @@ export default function ListaPersonas({
 }) {
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState<Filtro>("todos");
+  const [elegidos, setElegidos] = useState<Set<string>>(new Set());
 
   const m = useMemo(() => metricas(personas), [personas]);
 
@@ -48,6 +66,51 @@ export default function ListaPersonas({
       }),
     );
   }, [personas, busqueda, filtro]);
+
+  /**
+   * Los que se pueden llevar al teléfono: hace falta que tengan algo que
+   * guardar —un contacto o un cumpleaños—, si no son una fila vacía. Van del
+   * más cercano al más lejano, con el parentesco a la vista para saber quién es
+   * quién antes de tildarlo.
+   */
+  const agendables = useMemo(() => {
+    const saltos = miFichaId ? distanciasDesde(miFichaId, personas) : new Map<string, number>();
+    const ix = indexar(personas);
+    return personas
+      .filter((p) => p.id !== miFichaId && (tieneContacto(p) || cumpleDe(p)))
+      .map((p) => ({
+        persona: p,
+        salto: saltos.get(p.id) ?? Infinity,
+        vinculo: miFichaId ? (parentescoCon(miFichaId, p.id, personas, ix)?.etiqueta ?? null) : null,
+      }))
+      .sort(
+        (a, b) =>
+          a.salto - b.salto ||
+          nombreCompleto(a.persona).localeCompare(nombreCompleto(b.persona), "es"),
+      );
+  }, [personas, miFichaId]);
+
+  // Arranca con la familia cercana marcada. Sin saber quién sos —alguien que
+  // entró sólo a mirar— se marcan todos, que es lo único honesto que se puede
+  // suponer.
+  useEffect(() => {
+    setElegidos(
+      new Set(agendables.filter((x) => !miFichaId || x.salto <= CERCA).map((x) => x.persona.id)),
+    );
+  }, [agendables, miFichaId]);
+
+  const marcados = agendables.filter((x) => elegidos.has(x.persona.id)).map((x) => x.persona);
+  const conContacto = marcados.filter(tieneContacto);
+  const conCumple = marcados.filter((p) => cumpleDe(p));
+
+  function alternar(id: string) {
+    setElegidos((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  }
 
   return (
     <div className="hoja">
@@ -172,6 +235,94 @@ export default function ListaPersonas({
                 </button>
               </article>
             ))}
+          </div>
+        )}
+
+        {agendables.length > 0 && (
+          <div className="seccion-form">
+            <h3>Llevate la familia al teléfono</h3>
+            <p>
+              Dos archivos que abre cualquier teléfono: la agenda de contactos y un calendario de
+              cumpleaños que se repite todos los años y avisa esa misma mañana. Agendate a todos y
+              no te pierdas ninguno.
+            </p>
+            <p>
+              Elegí a quiénes te guardás. La lista arranca con tu familia cercana —hasta{" "}
+              {CERCA} saltos— para no llenarte la agenda de gente que no ubicás.
+            </p>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "12px 0" }}>
+              <button
+                className="btn chico"
+                onClick={() =>
+                  setElegidos(
+                    new Set(
+                      agendables.filter((x) => x.salto <= CERCA).map((x) => x.persona.id),
+                    ),
+                  )
+                }
+                disabled={!miFichaId}
+                title={miFichaId ? undefined : "Hace falta saber cuál es tu ficha"}
+              >
+                Sólo los cercanos
+              </button>
+              <button
+                className="btn chico"
+                onClick={() => setElegidos(new Set(agendables.map((x) => x.persona.id)))}
+              >
+                Marcar todos
+              </button>
+              <button className="btn chico" onClick={() => setElegidos(new Set())}>
+                Ninguno
+              </button>
+            </div>
+
+            <div className="caja-lista">
+              {agendables.map(({ persona: p, salto, vinculo }) => (
+                <label key={p.id} className="fila-check">
+                  <input
+                    type="checkbox"
+                    checked={elegidos.has(p.id)}
+                    onChange={() => alternar(p.id)}
+                  />
+                  <span className="quien">{nombreCompleto(p)}</span>
+                  <span className="met">
+                    {[
+                      vinculo ?? (Number.isFinite(salto) ? `a ${salto} saltos` : "sin parentesco"),
+                      tieneContacto(p) ? "contacto" : null,
+                      cumpleDe(p) ? "cumpleaños" : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
+              <button
+                className="btn"
+                disabled={!conContacto.length}
+                onClick={() =>
+                  descargarTexto("familia-contactos.vcf", contactosVcf(conContacto), "text/vcard")
+                }
+              >
+                Descargar contactos ({conContacto.length})
+              </button>
+              <button
+                className="btn"
+                disabled={!conCumple.length}
+                onClick={() =>
+                  descargarTexto("familia-cumpleanos.ics", cumplesIcs(conCumple), "text/calendar")
+                }
+              >
+                Descargar cumpleaños ({conCumple.length})
+              </button>
+            </div>
+            <p className="ayuda" style={{ marginTop: 10 }}>
+              Los cumpleaños son sólo de quienes tienen la fecha completa cargada y viven. Si falta
+              alguien, es que en su ficha no está el día — se puede completar.
+            </p>
           </div>
         )}
 

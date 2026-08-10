@@ -67,3 +67,21 @@ antes de recorrer.
 
 **Las fechas son parciales.** Nunca cambiar los campos a `<input type="date">`:
 obligaría a una fecha exacta y haría imposible cargar la mitad del árbol.
+
+## Cómo se firma un movimiento
+
+Sin login, la bitácora se firma con el nombre que cada uno declara al entrar, y
+la misma persona escribe el suyo distinto cada vez: «Ariel», «Ariel Baudry»,
+«Ariel Osvaldo Baudry». En el registro parecían tres.
+
+`nombreCanonico()` (en `coincidencias.ts`) resuelve el nombre declarado contra
+las fichas del árbol y guarda el nombre completo de la ficha. Es más permisivo
+que el `esInequivoca()` que decide en qué ficha abrirte el árbol —ahí
+equivocarse molesta; acá es sólo cómo se escribe un nombre en un registro—.
+
+Cuando hay empate de verdad, gana quien viene editando: en esta familia hay dos
+Arieles, y «Ariel» a secas se parece igual a los dos, pero uno de ellos nunca
+tocó el árbol. Si los dos editaran, el nombre queda tal como se escribió.
+
+La corrección se aplica en dos lugares: al anotar cada movimiento nuevo, y en
+`migrar()` sobre los que ya estaban guardados.

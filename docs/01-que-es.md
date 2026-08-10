@@ -23,6 +23,24 @@ y todavía no tienen padres cargados— como lista de lo que falta averiguar.
    igual: la app crea una ficha «Padre o madre» sin nombre para poder vincularlos,
    y avisa que lo hace.
 
+## Llevarse la familia al teléfono
+
+Al pie de la pestaña **Personas** hay dos descargas, con una lista para tildar a
+quiénes te llevás:
+
+- **contactos** en vCard (`.vcf`): nombre completo, celular, correo, dirección y
+  fecha de nacimiento;
+- **cumpleaños** en iCalendar (`.ics`): un evento de día entero por persona, que
+  se repite todos los años y avisa a las 9 de esa misma mañana.
+
+La lista arranca marcando a la familia cercana —hasta 3 saltos de vínculo desde
+tu ficha: padres, hijos, hermanos, abuelos, nietos, tíos, sobrinos y cuñados—.
+Los primos y para arriba se marcan a mano: la idea no es agendar a 70 personas
+que quizás ni ubicás.
+
+Sólo aparecen quienes tienen algo que guardar. Los cumpleaños, además, sólo de
+quienes tienen la fecha **completa** cargada y viven.
+
 ## Cómo se navega
 
 El árbol se ve **siempre completo**. Un clic en una caja abre esa ficha al

@@ -183,17 +183,23 @@ export default function App() {
   }, [autor, permisos.puedeVer, espejo]);
 
   /**
-   * Para quien ya venía usando el sitio antes de que se recordara la ficha
-   * propia: se deduce del nombre declarado, y sólo si no hay dudas.
+   * Cuál es mi ficha. La guardada, y si no hay —alguien que ya venía usando el
+   * sitio de antes— se deduce del nombre declarado, sólo si no hay dudas.
    */
-  const deducirMiFicha = useCallback(() => {
-    if (!autor) return null;
+  const miFichaId = useMemo(() => {
+    if (miFicha && personas.some((p) => p.id === miFicha)) return miFicha;
+    if (!autor || !personas.length) return null;
     const c = buscarPersona(autor, personas);
-    if (!esInequivoca(c)) return null;
-    guardarMiFicha(c[0].persona.id);
-    setMiFicha(c[0].persona.id);
-    return c[0].persona.id;
-  }, [autor, personas]);
+    return esInequivoca(c) ? c[0].persona.id : null;
+  }, [miFicha, autor, personas]);
+
+  // Deducida una vez, se recuerda: la próxima no hay que adivinar de nuevo.
+  useEffect(() => {
+    if (miFichaId && miFichaId !== miFicha) {
+      setMiFicha(miFichaId);
+      guardarMiFicha(miFichaId);
+    }
+  }, [miFichaId, miFicha]);
 
   const foco = useMemo(() => personas.find((p) => p.id === focoId) ?? null, [personas, focoId]);
 
@@ -679,8 +685,13 @@ export default function App() {
       <Bienvenida
         personas={personas}
         onListo={(n, id) => {
-          setAutor(n);
-          guardarAutor(n);
+          // Quien se reconoció en una ficha queda registrado con el nombre
+          // completo de esa ficha. Si no, "Ariel" y "Ariel Osvaldo Baudry"
+          // figuran como dos personas distintas en la bitácora.
+          const ficha = id ? personas.find((p) => p.id === id) : null;
+          const nombre = ficha ? nombreCompleto(ficha) : n;
+          setAutor(nombre);
+          guardarAutor(nombre);
           // El árbol abre en la ficha de quien entra: lo primero que uno quiere
           // ver es dónde está parado en su propia familia.
           if (id) {
@@ -709,8 +720,7 @@ export default function App() {
             setEdicion(null);
             setPanelAbierto(window.innerWidth > 900);
             setHistorial([]);
-            const mia = miFicha && personas.some((p) => p.id === miFicha) ? miFicha : null;
-            const destino = mia ?? deducirMiFicha() ?? ordenarPorNacimiento(personas).at(0)?.id;
+            const destino = miFichaId ?? ordenarPorNacimiento(personas).at(0)?.id;
             if (destino) {
               setFocoId(destino);
               guardarFoco(destino);
@@ -957,6 +967,7 @@ export default function App() {
       ) : vista === "personas" ? (
         <ListaPersonas
           personas={personas}
+          miFichaId={miFichaId}
           onFoco={(id) => irA(id)}
           onEditar={(p) => setEdicion({ modo: "editar", persona: p })}
           onNueva={() => setEdicion({ modo: "crear" })}
