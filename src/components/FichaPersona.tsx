@@ -29,7 +29,6 @@ interface Props {
   onFoco: (id: string) => void;
   onCerrar: () => void;
   onEditar: () => void;
-  onAgregar: (tipo: TipoVinculo) => void;
   /** Sin la clave de administración nadie borra: se corrige, no se elimina. */
   puedeBorrar: boolean;
   onBorrar: () => void;
@@ -101,7 +100,6 @@ export default function FichaPersona({
   onFoco,
   onCerrar,
   onEditar,
-  onAgregar,
   puedeBorrar,
   onBorrar,
 }: Props) {
@@ -194,12 +192,6 @@ export default function FichaPersona({
           </div>
         )}
 
-        {p.notas && (
-          <p className="prosa" style={{ fontSize: 13.5, color: "var(--tinta-suave)" }}>
-            {p.notas}
-          </p>
-        )}
-
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
           <button className="btn primario" onClick={onEditar}>
             Editar
@@ -209,25 +201,6 @@ export default function FichaPersona({
               Eliminar
             </button>
           )}
-        </div>
-
-        <div className="seccion-form">
-          <h3>Sumar familia</h3>
-          <p>Crea la persona y deja el vínculo hecho de los dos lados.</p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button className="btn chico" onClick={() => onAgregar("padre")}>
-              + Padre / madre
-            </button>
-            <button className="btn chico" onClick={() => onAgregar("pareja")}>
-              + Pareja
-            </button>
-            <button className="btn chico" onClick={() => onAgregar("hijo")}>
-              + Hijo / hija
-            </button>
-            <button className="btn chico" onClick={() => onAgregar("hermano")}>
-              + Hermano / hermana
-            </button>
-          </div>
         </div>
 
         {/* Linaje completo: cada persona del árbol con el nombre del vínculo,

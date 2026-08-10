@@ -239,7 +239,20 @@ export default function App() {
     }
   }
 
-  async function guardar(entrada: PersonaEntrada) {
+  /**
+   * "+ Padre", "+ Pareja"… desde el modal de edición: primero se guarda lo que
+   * se venía editando y recién después se abre la ficha del pariente nuevo.
+   */
+  async function guardarYSumar(tipo: TipoVinculo, datos: PersonaEntrada) {
+    if (edicion?.modo !== "editar") return;
+    const base = edicion.persona;
+    const ok = await guardar(datos, { cerrar: false });
+    if (!ok) return;
+    const alDia = personas.find((p) => p.id === base.id) ?? base;
+    setEdicion({ modo: "crear", vinculo: { tipo, base: alDia } });
+  }
+
+  async function guardar(entrada: PersonaEntrada, opciones: { cerrar?: boolean } = {}) {
     setGuardando(true);
     setErrorForm(null);
     setVersionAlDia(undefined);
@@ -316,7 +329,8 @@ export default function App() {
         irA(res.persona.id, { verArbol: false });
       }
       setEsEjemplo(false);
-      setEdicion(null);
+      if (opciones.cerrar !== false) setEdicion(null);
+      return true;
     } catch (e) {
       if (e instanceof ConflictoDeEdicion) {
         // Se recarga el árbol para que se vea lo que puso el otro, se adopta la
@@ -330,6 +344,7 @@ export default function App() {
       } else {
         setErrorForm(e instanceof Error ? e.message : "No se pudo guardar.");
       }
+      return false;
     } finally {
       setGuardando(false);
     }
@@ -779,7 +794,6 @@ export default function App() {
                 onFoco={(id) => irA(id, { verArbol: false })}
                 onCerrar={() => setPanelAbierto(false)}
                 onEditar={() => setEdicion({ modo: "editar", persona: foco })}
-                onAgregar={(tipo) => setEdicion({ modo: "crear", vinculo: { tipo, base: foco } })}
                 puedeBorrar={permisos.puedeBorrar}
                 onBorrar={() => void borrar(foco)}
               />
@@ -843,6 +857,7 @@ export default function App() {
           guardando={guardando}
           error={errorForm}
           onGuardar={(datos) => void guardar(datos)}
+          onAgregar={(tipo, datos) => void guardarYSumar(tipo, datos)}
           onCancelar={() => {
             setEdicion(null);
             setErrorForm(null);

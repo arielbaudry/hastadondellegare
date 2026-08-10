@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import CampoFecha from "@/components/CampoFecha";
 import FotosInput from "@/components/FotosInput";
 import { nombreCompleto, ordenarPorNacimiento, anio } from "@/lib/tree";
+import type { TipoVinculo } from "@/components/FichaPersona";
 import type { Pareja, Persona, PersonaEntrada, TipoPareja } from "@/lib/types";
 
 interface Props {
@@ -20,6 +21,12 @@ interface Props {
   onCancelar: () => void;
   /** Aclaración que depende de cómo se llegó al formulario. */
   nota?: string;
+  /**
+   * Sumar un pariente desde acá. Guarda primero lo que se esté editando —si no,
+   * el trabajo a medio hacer se perdería al abrir el otro formulario— y recién
+   * después abre la ficha nueva.
+   */
+  onAgregar?: (tipo: TipoVinculo, datos: PersonaEntrada) => void;
   /**
    * Versión al día de la ficha, cuando el guardado chocó con el de otro. Se
    * adopta sin tocar lo escrito, así el segundo intento sí entra.
@@ -51,6 +58,7 @@ export default function FormularioPersona({
   onCancelar,
   nota,
   versionAlDia,
+  onAgregar,
 }: Props) {
   // Los arrays de vínculos se copian aparte: con un spread superficial serían
   // el mismo array que el de la persona guardada, y cualquier retoque acá
@@ -356,6 +364,36 @@ export default function FormularioPersona({
               + Agregar pareja
             </button>
           </div>
+
+          {persona && onAgregar && (
+            <div className="seccion-form">
+              <h3>Sumar familia</h3>
+              <p>
+                Crea la persona y deja el vínculo hecho de los dos lados. Se guardan primero
+                los cambios de esta ficha.
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {(
+                  [
+                    ["padre", "+ Padre / madre"],
+                    ["pareja", "+ Pareja"],
+                    ["hijo", "+ Hijo / hija"],
+                    ["hermano", "+ Hermano / hermana"],
+                  ] as [TipoVinculo, string][]
+                ).map(([tipo, etiqueta]) => (
+                  <button
+                    key={tipo}
+                    type="button"
+                    className="btn chico"
+                    disabled={guardando}
+                    onClick={() => onAgregar(tipo, d)}
+                  >
+                    {etiqueta}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="seccion-form">
             <h3>Notas</h3>
