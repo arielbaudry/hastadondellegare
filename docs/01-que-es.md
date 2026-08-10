@@ -50,7 +50,7 @@ costado; un doble clic la abre para editar. Para moverse:
 - los **saltos rápidos** de la barra de contexto (`↑` padres, `↓` hijos);
 - los **chips de relaciones** de la ficha;
 - **← Atrás**, que deshace el recorrido;
-- tocar **«Hasta dónde llegaré»** vuelve al inicio.
+- tocar **«Hasta dónde llegaré»** te devuelve a tu propia ficha.
 
 ## Las fechas se cargan como se sepan
 
@@ -85,5 +85,11 @@ generaciones en un paso sin inventar gente.
 ## Quién está mirando
 
 Arriba hay un globo con la cantidad de personas conectadas; al tocarlo dice
-quiénes. El nombre firma cada ficha, y en **Ajustes** hay una bitácora con los últimos
-movimientos: quién entró y quién cargó o corrigió a quién.
+quiénes. El nombre firma cada ficha, y en **Ajustes** está el resumen de quién movió
+cuánto, con un botón que abre el registro completo en una ventana aparte: quién
+entró y quién cargó o corrigió a quién.
+
+Una misma persona escribe su nombre distinto cada vez —«Ariel», «Ariel Baudry»,
+«Ariel Osvaldo Baudry»—, así que al anotar se resuelve contra las fichas del
+árbol y queda el nombre completo. Si hay empate real —en esta familia hay dos
+Arieles— gana quien viene editando; si los dos editan, se deja como se escribió.

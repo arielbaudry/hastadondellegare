@@ -54,3 +54,35 @@ sincronización se llevara puesto el trabajo de alguien. El espejo siempre cede.
 
 Se vence sola y no merece historial. Anotarla en el árbol sería un commit cada
 veinte segundos por persona.
+
+## Los vínculos que no se guardan igual se piden
+
+Sólo existen `padres` y `parejas`, pero el formulario tiene una sección por cada
+tipo de vínculo —ascendentes, hijos, hermanos, pareja— y las cuatro funcionan
+igual: elegir de la lista o crear la ficha nueva ahí mismo. Lo que el usuario
+elige se traduce a los dos campos que sí existen.
+
+Tenerlo prolijo por dentro no puede costarle a quien carga: nadie tiene por qué
+saber que «hijo» se guarda del otro lado.
+
+## Quedarse corto antes que envejecer a alguien
+
+Ante una fecha incompleta, la edad que se muestra es la menor. Es la única
+decisión que no molesta a nadie.
+
+## Las herramientas de una pasada se borran
+
+El cruce con el CRM del servidor y la importación de fotos de WhatsApp fueron
+dos páginas que corrieron unos días, hicieron su trabajo —26 datos de contacto y
+8 fotos— y se apagaron: proceso, regla de ufw y carpeta. Lo que quedó fue el
+resultado, no la herramienta.
+
+Cada portal encendido es una puerta más y un proceso que alguien olvida. Si hace
+falta volver a cruzar, está anotado cómo.
+
+## Se propone, no se importa
+
+Ninguno de esos cruces escribió nada por su cuenta. El CRM tiene homónimos
+—tres «Maria Ines Rodriguez»— y WhatsApp da por bueno un número argentino mal
+formado como si fuera de otro país. Una máquina puede acercar candidatos; quién
+es quién en una familia lo dice una persona.

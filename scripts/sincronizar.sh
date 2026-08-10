@@ -22,9 +22,19 @@ mkdir -p storage
 ahora() { TZ=America/Argentina/Buenos_Aires date '+%Y-%m-%d %H:%M'; }
 
 inicio=$(date +%s%N)
-codigo=$(curl -s -o /tmp/hdll-ping.json -w '%{http_code}' --max-time 30 "$SITIO/api/arbol")
+codigo=$(curl -s -o /tmp/hdll-ping.json -D /tmp/hdll-ping.head -w '%{http_code}' --max-time 30 "$SITIO/api/arbol")
 rc=$?
 ms=$(( ($(date +%s%N) - inicio) / 1000000 ))
+
+# El "Vercel Security Checkpoint" contesta 403 a todo lo que no sea un navegador
+# resolviendo su desafío de JavaScript. El sitio NO está caído: está detrás de la
+# protección contra ataques, que se prende sola ante una ráfaga de tráfico
+# automatizado. Confundirlo con una caída manda a buscar el problema donde no
+# está — y lo que hay que hacer es apagarla en el panel de Vercel (Firewall).
+if grep -qi '^x-vercel-mitigated: *challenge' /tmp/hdll-ping.head 2>/dev/null; then
+  echo "$(ahora) PROTEGIDO Vercel pide el desafío del navegador — apagar Attack Challenge Mode en el panel (${ms}ms)" >> "$REGISTRO"
+  exit 0
+fi
 
 if [ "$rc" -ne 0 ] || [ "$codigo" != "200" ]; then
   echo "$(ahora) CAIDO codigo=$codigo curl=$rc ${ms}ms" >> "$REGISTRO"

@@ -68,6 +68,15 @@ antes de recorrer.
 **Las fechas son parciales.** Nunca cambiar los campos a `<input type="date">`:
 obligaría a una fecha exacta y haría imposible cargar la mitad del árbol.
 
+## La edad no es restar los años
+
+`edad()` mira si el cumpleaños ya llegó. Restar 2026 − 1975 da uno de más
+durante casi todo el año, y lo mismo pasaba con la edad al fallecer.
+
+Con fechas incompletas se elige la edad **menor**: si sólo se sabe el mes y es
+justo éste, el cumpleaños puede no haber pasado, y es preferible quedarse corto
+que envejecer a alguien. Sabiendo sólo el año no hay nada que decidir.
+
 ## Cómo se firma un movimiento
 
 Sin login, la bitácora se firma con el nombre que cada uno declara al entrar, y

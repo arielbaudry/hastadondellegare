@@ -12,6 +12,17 @@
 | [06-operacion.md](06-operacion.md) | Rutinas, crons, qué hacer si algo falla |
 | [07-decisiones.md](07-decisiones.md) | Por qué está hecho así y no de otra manera |
 
+## Estado — versión 1.0 (10 de agosto de 2026)
+
+Primera versión estable: **80 personas cargadas, 21 con foto**, desde Bautista
+Baudry (1908) hasta los bisnietos. El sitio está abierto —se carga y se corrige
+sin contraseña, y nadie puede eliminar—; los magic links están programados y se
+encienden solos cuando estén sus variables.
+
+Pendiente, en orden: la contraseña SMTP para encender el acceso por enlace,
+cambiar `ADMIN_CLAVE`, decidir si el repositorio queda público, y seguir
+cargando fotos y antepasados.
+
 **Lo mínimo que hay que saber:**
 
 - El árbol que vale es **https://hastadondellegare.vercel.app**. Ahí carga la

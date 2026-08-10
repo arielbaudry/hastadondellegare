@@ -33,6 +33,25 @@ Lo que conviene tener presente antes de tocar código:
   campo `genero` existe sólo para nombrarlos bien y **no se pregunta en el
   formulario**: en una familia puede incomodar. Se cargó una vez para las fichas
   históricas; sin dato va la forma neutra y no pasa nada. No reponer ese campo.
+- **Hijos y hermanos no se guardan, pero el formulario los pide igual.**
+  `hijos` y `hermanosDe` son instrucciones de `PersonaEntrada`, no campos: el
+  cliente los saca de la entrada y los traduce (un hijo se escribe en el campo
+  `padres` de ese hijo; unos hermanos quedan con los mismos padres). Las reglas
+  —nadie con tres padres, nadie ascendente y descendente a la vez— se revisan
+  **antes de escribir nada**: guardar la mitad deja la ficha en pantalla
+  desactualizada y el reintento choca contra su propia versión.
+- **`FormularioPersona` lleva `key`.** Sin eso React reusa el mismo formulario
+  al pasar de editar a «+ Crear hijo/a» y arrastra los vínculos de la persona
+  anterior.
+- **`edad()` mira si el cumpleaños llegó**, y ante una fecha incompleta elige la
+  edad menor. Restar los años a secas envejecía a todos un año durante casi todo
+  el año.
+- **La bitácora se firma con el nombre canónico** (`nombreCanonico()` en
+  `coincidencias.ts`): «Ariel», «Ariel Baudry» y «Ariel Osvaldo Baudry» son uno
+  solo. Es más permisivo que `esInequivoca()` a propósito —acá equivocarse sólo
+  cambia cómo se escribe un nombre en un registro—, y ante empate real gana
+  quien viene editando. **Hay dos Arieles en el árbol**: no endurecer ni aflojar
+  esa regla sin probar con ese caso.
 - **`fotos` es una lista, nunca un campo único.** Se suman y ninguna pisa a la
   anterior; la primera es el retrato. `store.migrar()` convierte el viejo
   `fotoUrl` en cada lectura: sin eso, un árbol guardado antes aparecería sin
@@ -119,6 +138,26 @@ Eliminar personas, importar respaldos y sembrar el ejemplo exigen `ADMIN_CLAVE`
 aflojar este default: el sitio es público y sin login. Editar sí queda libre —
 un dato mal cargado se corrige, uno borrado no vuelve.
 
+## Herramientas de una pasada
+
+El cruce con el CRM del servidor (`/home/hpp/padron`) y la importación de fotos
+de WhatsApp fueron páginas temporales que ya se borraron: recuperaron 26 datos de
+contacto y 8 fotos. Lo que quedó guardado, fuera del repo, está en
+`storage/respaldos/` (`cotejo-crm-decisiones-*.json`, `whatsapp-avatares-*.json`).
+
+Si hace falta volver a esa fuente: el bot de MCV en la VM de Oracle tiene el
+endpoint de sólo lectura `/foto-perfil` (skill `servidor_oracle`, sección 4b), y
+el reconocimiento facial con nombres del iPhone está en la memoria del agente
+(`caras-con-nombre-iphone`). Dos trampas ya pagadas: WhatsApp da por bueno un
+número argentino en formato local como si fuera de otro país, y las fotos del
+iPhone se mapean por carpeta **y** nombre de archivo, nunca sólo por nombre.
+
+Otras 5 fotos entraron después desde el reconocimiento facial del backup del
+iPhone, con un script de una pasada; no quedó código que mantener.
+
 ## Pendiente
 
-- Cerrar el modo abierto y pasar a magic links cuando esté cargado lo grueso.
+- **Encender los magic links**: falta sólo la contraseña SMTP de DAS Latam.
+- **Cambiar `ADMIN_CLAVE`** en Vercel: la de prueba circuló en una conversación.
+- **Decidir la visibilidad del repo**: es público y el teléfono de Ariel quedó en
+  el historial de commits viejos.

@@ -5,7 +5,11 @@ apellidos, fechas, lugar de nacimiento y contacto opcional; los vínculos se
 navegan hacia arriba, hacia abajo y a los costados, y la ficha nombra cada
 parentesco ("tía abuela", "primo segundo") en vez de pedir que se cargue.
 
-Se entra por *magic link* al correo que ya figura en la ficha de cada uno.
+**Hoy el sitio está abierto**: se entra con el link, se pregunta el nombre una
+vez y se puede cargar y corregir sin contraseña. Eliminar está bloqueado para
+todos. El acceso por *magic link* al correo de cada ficha está programado y
+listo, y se enciende solo cuando estén puestas sus variables (ver
+[`docs/05`](docs/05-acceso-y-permisos.md)).
 
 > **Documentación completa en [`docs/`](docs/).** Y en el tablero del servidor,
 > con estado en vivo: https://192.168.1.71/arbol
@@ -26,9 +30,13 @@ Se entra por *magic link* al correo que ya figura en la ficha de cada uno.
 ## Cómo se usa
 
 1. **Cargate a vos primero.** Después, desde tu ficha, «+ Padre / madre».
-2. Cada persona nueva se crea **desde la ficha de otra**, con los botones de
-   *Sumar familia*. Así el vínculo queda hecho de los dos lados sin que haya que
-   acordarse de nada.
+2. El modal de edición tiene **una sección por tipo de vínculo** —ascendentes,
+   hijos, hermanos, pareja— y las cuatro funcionan igual: se **elige de la
+   lista** a alguien ya cargado, o se **crea** la ficha nueva ahí mismo, con el
+   vínculo hecho de los dos lados. Los botones «Crear…» guardan primero lo que
+   estabas editando.
+
+   La ficha del costado es sólo para mirar: datos, contacto y linaje.
 3. **El árbol se ve siempre completo.** Un clic en una caja abre esa ficha al
    costado; un doble clic la abre para editar. Para moverse hay cuatro caminos,
    y todos llevan al mismo lado:
@@ -45,8 +53,12 @@ Se entra por *magic link* al correo que ya figura en la ficha de cada uno.
    También tiene buscador, filtros y el panel **«Hasta acá llegamos»**: las
    personas fallecidas de las que todavía no hay padres cargados. Ésa es la
    lista de lo que falta averiguar — el nombre del proyecto.
-6. **Ajustes** tiene **Deshacer el último cambio**, respaldos (JSON/CSV), tema y
-   el desbloqueo de administración.
+   Al pie están las dos descargas para llevarse la familia al teléfono: la
+   agenda de **contactos** (`.vcf`) y los **cumpleaños** (`.ics`), con
+   repetición anual y aviso esa misma mañana. Se tilda a quién te llevás y la
+   lista arranca en la familia cercana.
+6. **Ajustes** tiene **Deshacer el último cambio**, respaldos (JSON/CSV), tema,
+   el registro de quién hizo qué y el desbloqueo de administración.
 
 ### Parentescos
 
@@ -497,3 +509,37 @@ descuido, y el cartel de arriba lo dice en la cara. Lo que implica mientras dure
 3. Ocultar el bloque de contacto a quien no esté autenticado.
 4. Guardar quién editó qué con identidad real — hoy `creadoPor` es sólo el
    nombre que la persona declara en su navegador.
+
+---
+
+## Estado — versión 1.0 (10 de agosto de 2026)
+
+Primera versión estable. El sitio está en producción, lo usa la familia y las
+piezas que faltan son de crecimiento, no de armado.
+
+| | |
+|---|---|
+| Personas cargadas | 80 |
+| Con foto | 21 |
+| Generaciones | desde Bautista Baudry (1908) hasta los bisnietos |
+| Movimientos registrados | 58 |
+| Modo de acceso | abierto, sin contraseña; eliminar bloqueado para todos |
+
+**Lo que quedó funcionando:** el árbol completo con líneas por apellido y
+posiciones estables; fichas con fotos múltiples, fechas parciales y linaje con
+el nombre de cada parentesco; alta de personas por vínculo desde cualquier
+ficha; presencia en vivo y bloqueo optimista por ficha; registro de movimientos
+con los nombres unificados; versión de celular con menú; descargas de contactos
+y cumpleaños; espejo local de sólo lectura con respaldo diario.
+
+**Lo que queda pendiente**, en orden:
+
+1. **Encender los magic links.** Falta sólo la contraseña SMTP de DAS Latam; el
+   código está y se activa solo al aparecer las variables.
+2. **Cambiar `ADMIN_CLAVE`** en Vercel: la que se usó para probar circuló en una
+   conversación.
+3. **Decidir la visibilidad del repositorio.** Es público y el teléfono personal
+   de Ariel quedó en el historial de commits viejos. Pasarlo a privado lo
+   resuelve.
+4. Seguir cargando: 59 de las 80 fichas todavía no tienen foto, y la pestaña
+   Personas lista las puntas abiertas del árbol.

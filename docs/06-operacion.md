@@ -11,7 +11,7 @@
 El registro vive en `storage/vigilancia.log`, una línea por corrida:
 
 ```
-2026-08-09 22:51 OK 557ms personas=72
+2026-08-09 22:51 OK 557ms personas=80
 ```
 
 Si el sitio no responde, la línea dice `CAIDO` con el código.
@@ -48,6 +48,18 @@ Vale la molestia: un script de reproducción que escriba sobre el árbol de verd
 borra datos de la familia. Ya pasó una vez.
 
 ## Si algo falla
+
+**El sitio contesta 403 con «Vercel Security Checkpoint».** No está caído: es la
+protección contra ataques de Vercel, que se enciende sola ante una ráfaga de
+tráfico automatizado y le pide a cada visitante resolver un desafío de
+JavaScript. Bloquea el ping, los respaldos y —según el navegador— también a la
+familia. Se apaga en el panel de Vercel: **proyecto → Firewall → Attack
+Challenge Mode → off**. La cabecera que lo delata es `x-vercel-mitigated:
+challenge`, y desde el 10/08/2026 el registro lo anota como `PROTEGIDO` en vez
+de `CAIDO`.
+
+Para no provocarlo: nada de ráfagas contra `/api/`. Las pruebas van contra una
+copia local con `ARBOL_DIR`, no contra producción.
 
 **El sitio no carga y dice que falta configurar.** Faltan `GITHUB_REPO` y
 `GITHUB_TOKEN` en Vercel. Sin eso no hay dónde escribir y el árbol abre vacío.
