@@ -204,8 +204,14 @@ El armado tiene cuatro pasos:
    entre sí, sólo como padres de los mismos hijos.
 2. **Niveles.** Cada unidad recibe un número de generación relajando la regla
    «los hijos van al menos un nivel más abajo que sus padres», con un tope de
-   iteraciones por si algún dato armara un ciclo. Es lo que mantiene alineada
-   una generación entera aunque falten eslabones.
+   iteraciones por si algún dato armara un ciclo. Sobre eso van dos reglas más,
+   que son las que mantienen alineada una generación entera aunque falten
+   eslabones: **los hermanos comparten renglón** (el del que haya quedado más
+   abajo) y **quien no tiene padres cargados baja hasta pegarse a sus hijos**.
+   Sin ellas manda la cadena de ancestros más larga y la familia se desalinea:
+   los abuelos maternos aparecían un renglón por encima de los paternos —de
+   estos había un bisabuelo cargado y de aquellos no— y dos hermanos quedaban
+   arriba de la tercera, a la que empujaba para abajo la rama de su marido.
 3. **Orden horizontal.** Cada unidad cuelga de **una** unidad madre (la primera,
    si hay dos), lo que deja un bosque; ese bosque se acomoda con el layout
    *tidy* clásico: se mide de abajo hacia arriba y se centra cada bloque sobre
@@ -270,6 +276,17 @@ es el árbol. En escritorio nada de esto cambia (el envoltorio del menú es
   nunca llegan a la caja.
 - `Ver todo` encuadra el árbol entero; `Centrar` lleva la cámara al foco sin
   tocar el zoom.
+- `Pantalla completa` deja el árbol solo, sin encabezado, lista ni ficha. Son
+  dos cosas a la vez: una capa fija propia (`.lienzo.pantalla-completa`) y la
+  pantalla completa del navegador, que además se lleva la barra de direcciones.
+  La segunda es un extra —iOS no la da fuera de un video— y se le pide a
+  `documentElement`, no al lienzo: si no, el formulario que se abre con doble
+  clic quedaría debajo del elemento en pantalla completa y no se vería. Se sale
+  con el mismo botón o con `Esc`.
+- **Al cambiar de tamaño el lienzo se conserva el punto que estaba en el
+  centro** (`ResizeObserver`). La cámara está anclada arriba a la izquierda: sin
+  eso, entrar a pantalla completa o girar el teléfono corría el árbol hacia un
+  costado justo cuando aparece más lugar.
 - Si para que entre el árbol habría que achicarlo por debajo de
   `ESCALA_LEGIBLE` (0.45; 0.55 en pantallas angostas) — pasa siempre en el
   celular — no se achica: se centra y se navega arrastrando.

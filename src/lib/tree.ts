@@ -427,8 +427,10 @@ function agregar<T>(mapa: Map<string, Set<T>>, clave: string, valor: T) {
  *  1. **Unidades.** Las parejas y quienes comparten un hijo se agrupan en una
  *     sola unidad, que se dibuja como un bloque de cajas pegadas.
  *  2. **Niveles.** Cada unidad recibe un número de generación, relajando la
- *     regla "los hijos van al menos un nivel más abajo que sus padres". Es lo
- *     que mantiene alineada a toda una generación aunque falten eslabones.
+ *     regla "los hijos van al menos un nivel más abajo que sus padres", más
+ *     dos reglas que alinean la generación aunque falten eslabones: los
+ *     hermanos comparten renglón, y quien no tiene padres cargados baja hasta
+ *     pegarse a sus hijos en vez de flotar arriba de todo.
  *  3. **Orden horizontal.** Cada unidad cuelga de UNA unidad madre (la primera,
  *     si hay dos), lo que deja un bosque; ese bosque se acomoda con el layout
  *     *tidy* clásico, midiendo de abajo hacia arriba y centrando cada bloque
@@ -545,18 +547,64 @@ export function diagramar(personas: Persona[]): Diagrama {
   }
 
   const nivel = new Map<string, number>(unidades.map((u) => [u, 0]));
-  // Relajación acotada: si algún dato armara un ciclo, corta igual.
+
+  /** Los hijos, al menos un renglón debajo de sus padres. Relajación acotada:
+   *  si algún dato armara un ciclo, corta igual. */
+  const bajarHijos = () => {
+    for (let vuelta = 0; vuelta <= unidades.length; vuelta++) {
+      let cambio = false;
+      for (const u of unidades) {
+        for (const h of hijasDe.get(u) ?? []) {
+          if (nivel.get(u)! + 1 > nivel.get(h)!) {
+            nivel.set(h, nivel.get(u)! + 1);
+            cambio = true;
+          }
+        }
+      }
+      if (!cambio) break;
+    }
+  };
+  bajarHijos();
+
+  // Con esa regla sola cada generación queda tan abajo como la obligue su
+  // cadena de ancestros más larga, y eso desalinea a la familia: quien no
+  // tiene padres cargados flota hasta el renglón de más arriba, y unos
+  // hermanos se separan cuando a uno lo empuja para abajo la rama de su
+  // pareja. Pasó de verdad: los abuelos maternos aparecían un renglón por
+  // encima de los paternos —de estos últimos había un bisabuelo cargado— y dos
+  // hermanos quedaban arriba de la tercera, casada del otro lado.
+  //
+  // Se corrige con dos reglas más, aplicadas hasta que se estabilice:
+  //   a. los hermanos comparten renglón, el del que haya quedado más abajo;
+  //   b. quien no tiene padres cargados baja hasta pegarse a sus hijos, en vez
+  //      de flotar arriba de todo.
+  // Las dos sólo empujan hacia abajo y ninguna toca a una unidad por encima de
+  // sus propios hijos, así que "los hijos van más abajo" se sigue cumpliendo.
   for (let vuelta = 0; vuelta <= unidades.length; vuelta++) {
     let cambio = false;
     for (const u of unidades) {
-      for (const h of hijasDe.get(u) ?? []) {
-        if (nivel.get(u)! + 1 > nivel.get(h)!) {
-          nivel.set(h, nivel.get(u)! + 1);
+      const hermanas = [...(hijasDe.get(u) ?? [])];
+      if (hermanas.length < 2) continue;
+      const masBajo = Math.max(...hermanas.map((h) => nivel.get(h)!));
+      for (const h of hermanas) {
+        if (nivel.get(h)! < masBajo) {
+          nivel.set(h, masBajo);
           cambio = true;
         }
       }
     }
+    for (const u of unidades) {
+      if (madresDe.get(u)?.size) continue;
+      const hijas = [...(hijasDe.get(u) ?? [])];
+      if (!hijas.length) continue;
+      const tope = Math.min(...hijas.map((h) => nivel.get(h)!)) - 1;
+      if (nivel.get(u)! < tope) {
+        nivel.set(u, tope);
+        cambio = true;
+      }
+    }
     if (!cambio) break;
+    bajarHijos();
   }
 
   // 3 — bosque de layout: cada unidad cuelga de una sola madre.

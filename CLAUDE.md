@@ -22,6 +22,11 @@ Lo que conviene tener presente antes de tocar código:
   parejas y co-paternidad), les asigna nivel de generación y acomoda el bosque.
   No volver al recorrido desde el foco: dejaba invisibles las ramas laterales y
   parecía que el foco «saltaba» de persona.
+- **Alinear la generación necesita tres reglas, no una.** Además de «los hijos
+  van más abajo que sus padres», los hermanos comparten renglón y quien no tiene
+  padres cargados baja hasta pegarse a sus hijos. Con la primera sola manda la
+  cadena de ancestros más larga: los abuelos maternos quedaban un renglón arriba
+  de los paternos, y unos hermanos arriba de la hermana casada del otro lado.
 - **Los hijos cuelgan del punto de unión de su pareja**, no de cada padre ni del
   bloque. Sin eso, en una familia ensamblada todos los hijos parecen ser de
   todos los adultos del bloque. Va junto con ordenar los miembros de la unidad
@@ -161,3 +166,13 @@ iPhone, con un script de una pasada; no quedó código que mantener.
 - **Cambiar `ADMIN_CLAVE`** en Vercel: la de prueba circuló en una conversación.
 - **Decidir la visibilidad del repo**: es público y el teléfono de Ariel quedó en
   el historial de commits viejos.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

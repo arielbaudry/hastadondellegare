@@ -104,6 +104,7 @@ export default function ArbolVista({
   const contenedor = useRef<HTMLDivElement>(null);
   const [camara, setCamara] = useState<Camara>({ x: 0, y: 0, k: 1 });
   const [arrastrando, setArrastrando] = useState(false);
+  const [pantallaCompleta, setPantallaCompleta] = useState(false);
   const ultimo = useRef<{ x: number; y: number } | null>(null);
   const ultimoClic = useRef<{ id: string; cuando: number } | null>(null);
   /** Hubo arrastre en este gesto: el clic final no debe contar como selección. */
@@ -283,6 +284,74 @@ export default function ArbolVista({
     return () => el.removeEventListener("wheel", alGirar);
   }, []);
 
+  /**
+   * Pantalla completa. Son dos cosas a la vez: la capa fija del CSS —que tapa
+   * el encabezado, la lista y la ficha— y la pantalla completa del navegador,
+   * que además se lleva la barra de direcciones. La segunda es un extra: iOS
+   * no la da fuera de un video, y ahí alcanza con la capa fija.
+   *
+   * Se la pide a `documentElement`, no al lienzo: así el resto de la página
+   * —sobre todo el formulario, que se abre con doble clic— queda dentro del
+   * elemento en pantalla completa y se sigue viendo. Pidiéndosela al lienzo,
+   * los diálogos quedaban debajo y no aparecían.
+   */
+  useEffect(() => {
+    if (pantallaCompleta) {
+      if (!document.fullscreenElement) {
+        void document.documentElement.requestFullscreen?.().catch(() => {});
+      }
+    } else if (document.fullscreenElement) {
+      void document.exitFullscreen?.().catch(() => {});
+    }
+  }, [pantallaCompleta]);
+
+  useEffect(() => {
+    // Salir con Escape (o con el gesto del navegador) tiene que apagar también
+    // la capa fija, si no el árbol queda tapando todo sin forma de volver.
+    const alSalirDelNavegador = () => {
+      if (!document.fullscreenElement) setPantallaCompleta(false);
+    };
+    const alTeclear = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPantallaCompleta(false);
+    };
+    document.addEventListener("fullscreenchange", alSalirDelNavegador);
+    window.addEventListener("keydown", alTeclear);
+    return () => {
+      document.removeEventListener("fullscreenchange", alSalirDelNavegador);
+      window.removeEventListener("keydown", alTeclear);
+    };
+  }, []);
+
+  /**
+   * Cuando cambia el tamaño del lienzo —entrar o salir de pantalla completa,
+   * girar el teléfono, abrir la ficha— se conserva el punto que estaba en el
+   * centro. La cámara está anclada arriba a la izquierda: sin esto el árbol
+   * parece saltar hacia un costado justo cuando aparece más lugar.
+   */
+  useEffect(() => {
+    const el = contenedor.current;
+    if (!el) return;
+    let previo: { ancho: number; alto: number } | null = null;
+    const observador = new ResizeObserver(([entrada]) => {
+      const { width: ancho, height: alto } = entrada.contentRect;
+      const antes = previo;
+      previo = { ancho, alto };
+      if (!antes || !antes.ancho || !antes.alto) return;
+      if (antes.ancho === ancho && antes.alto === alto) return;
+      if (!camaraTocada.current) {
+        encuadrar();
+        return;
+      }
+      setCamara((c) => ({
+        ...c,
+        x: c.x + (ancho - antes.ancho) / 2,
+        y: c.y + (alto - antes.alto) / 2,
+      }));
+    });
+    observador.observe(el);
+    return () => observador.disconnect();
+  }, [encuadrar]);
+
   function zoom(factor: number) {
     const caja = contenedor.current?.getBoundingClientRect();
     if (!caja) return;
@@ -307,7 +376,9 @@ export default function ArbolVista({
   return (
     <div
       ref={contenedor}
-      className={`lienzo${arrastrando ? " arrastrando" : ""}`}
+      className={`lienzo${arrastrando ? " arrastrando" : ""}${
+        pantallaCompleta ? " pantalla-completa" : ""
+      }`}
       onPointerDown={(e) => {
         if (e.button !== 0) return;
         dedos.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -568,6 +639,19 @@ export default function ArbolVista({
           aria-label="Ver todo"
         >
           Ver todo
+        </button>
+        <button
+          className="btn chico texto-largo"
+          data-accion={pantallaCompleta ? "salir-pantalla" : "pantalla"}
+          onClick={() => setPantallaCompleta((v) => !v)}
+          title={
+            pantallaCompleta
+              ? "Salir de pantalla completa (Esc)"
+              : "Ver el árbol en toda la pantalla"
+          }
+          aria-label={pantallaCompleta ? "Salir de pantalla completa" : "Pantalla completa"}
+        >
+          {pantallaCompleta ? "Salir" : "Pantalla completa"}
         </button>
       </div>
     </div>

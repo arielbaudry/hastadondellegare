@@ -319,6 +319,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .lienzo.arrastrando { cursor: grabbing; }
 
+/* Pantalla completa: el árbol tapa el encabezado, la lista y la ficha. Es una
+   capa fija propia y no sólo la pantalla completa del navegador, porque iOS no
+   la da fuera de un video. Queda por debajo del diálogo (z-index 60): el
+   formulario se abre con doble clic desde acá mismo y tiene que verse. */
+.lienzo.pantalla-completa { position: fixed; inset: 0; z-index: 56; }
+
 /* El SVG se posiciona absoluto en vez de usar height:100%. Con la columna de
    móvil el contenedor no tiene alto definido, el porcentaje caía al alto por
    defecto de un reemplazado (150px) y el árbol quedaba recortado a la primera
@@ -641,6 +647,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .controles-lienzo .btn.texto-largo::after { font-size: 16px; }
   .controles-lienzo .btn[data-accion="entorno"]::after { content: "◎"; }
   .controles-lienzo .btn[data-accion="todo"]::after { content: "⛶"; }
+  .controles-lienzo .btn[data-accion="pantalla"]::after { content: "⤢"; }
+  .controles-lienzo .btn[data-accion="salir-pantalla"]::after { content: "⤡"; }
   .pista { display: none; }
 
   /* La ficha sube desde abajo y tapa el árbol sólo mientras se la mira. */

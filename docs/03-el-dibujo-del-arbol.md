@@ -18,10 +18,18 @@ Cuatro pasos:
    pareja.
 2. **Niveles.** Cada unidad recibe un número de generación relajando la regla
    «los hijos van al menos un nivel más abajo que sus padres», con tope de
-   iteraciones por si un dato armara un ciclo.
+   iteraciones por si un dato armara un ciclo. Después vienen dos reglas más,
+   que son las que alinean la generación: **los hermanos comparten renglón** y
+   **quien no tiene padres cargados baja hasta pegarse a sus hijos**.
 3. **Orden horizontal.** Cada unidad cuelga de **una** unidad madre, lo que deja
    un bosque; se acomoda con el layout *tidy* clásico.
 4. **Empaquetado.** Los árboles sueltos se ponen uno al lado del otro.
+
+> **Sin esas dos reglas la familia se desalineaba.** La cadena de ancestros más
+> larga mandaba: los abuelos maternos aparecían un renglón por encima de los
+> paternos —de estos había un bisabuelo cargado y de aquellos no—, y dos
+> hermanos quedaban arriba de la tercera, a la que empujaba para abajo la rama
+> de su marido.
 
 ## Los hijos cuelgan de su pareja, no del bloque
 
