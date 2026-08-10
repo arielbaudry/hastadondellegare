@@ -29,8 +29,9 @@ Lo que conviene tener presente antes de tocar código:
 - **Los roles van aparte** (`rolesRespectoA()`), justamente para que cambiar de
   foco no rearme el diagrama ni mueva la cámara.
 - **Los parentescos se calculan, no se cargan** (`src/lib/parentesco.ts`). El
-  campo `genero` existe sólo para nombrarlos bien y es opcional: sin dato va la
-  forma neutra ("tío/a abuelo/a").
+  campo `genero` existe sólo para nombrarlos bien y **no se pregunta en el
+  formulario**: en una familia puede incomodar. Se cargó una vez para las fichas
+  históricas; sin dato va la forma neutra y no pasa nada. No reponer ese campo.
 - **`fotos` es una lista, nunca un campo único.** Se suman y ninguna pisa a la
   anterior; la primera es el retrato. `store.migrar()` convierte el viejo
   `fotoUrl` en cada lectura: sin eso, un árbol guardado antes aparecería sin
