@@ -1,0 +1,265 @@
+{
+ "personas": [
+  {
+   "id": "3717e2f0-8c1b-4400-a8d9-d7585446d0d9",
+   "nombre": "Andres Pombo",
+   "celular": "+5491125491986",
+   "fotos": 0,
+   "numero": "5491125491986",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/636713076_1233871055013279_7299089520106326118_n.jpg?ccb=11-4&oh=01_Q5Aa5QFnkDmaJJkOETB9ycSUJ5ABKBnLY0rAXTD6SPWye2_2DQ&oe=6A867EEF&_nc_sid=5e03e0&_nc_cat=106",
+   "estado": "con foto"
+  },
+  {
+   "id": "90506ad2-333c-4ed9-bf91-1db5742a50db",
+   "nombre": "Gabriela Fabiana Baudry",
+   "celular": "+5492257539661",
+   "fotos": 0,
+   "numero": "5492257539661",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/652672250_1314617324098832_6512524853421108730_n.jpg?ccb=11-4&oh=01_Q5Aa5QENwNfwsq7ainZEURE25y3MTfFQVgTY6OMx3YNiGi4PgQ&oe=6A86759E&_nc_sid=5e03e0&_nc_cat=110",
+   "estado": "con foto"
+  },
+  {
+   "id": "0e131e36-5a9a-42e3-940c-cd25497b3edd",
+   "nombre": "Guillermo Pombo",
+   "celular": "1152473321",
+   "fotos": 0,
+   "numero": "5491152473321",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/567287438_1152159160208479_7897368870650266854_n.jpg?ccb=11-4&oh=01_Q5Aa5QE3zBC1KV3vzzVP4uNknTOxpxcvy8S9gbheBUlhaPpFlg&oe=6A86550E&_nc_sid=5e03e0&_nc_cat=100",
+   "estado": "con foto"
+  },
+  {
+   "id": "7357b603-f70b-41da-a31d-0fe23f1c2781",
+   "nombre": "Hernan Baudry",
+   "celular": "1156267003",
+   "fotos": 0,
+   "numero": "5491156267003",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/399197370_722220219792387_299286178855968899_n.jpg?ccb=11-4&oh=01_Q5Aa5QExKo00kHxD5f6ZZeEKVDvgUAfh1bCM7WyRt2IcEL3rRQ&oe=6A864F18&_nc_sid=5e03e0&_nc_cat=111",
+   "estado": "con foto"
+  },
+  {
+   "id": "019b3068-9323-4cd0-ac10-79f7e079d348",
+   "nombre": "Maria Berenice Baudry",
+   "celular": "+5492257501265",
+   "fotos": 0,
+   "numero": "5492257501265",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/383758837_6833685326678134_7683662817044602526_n.jpg?ccb=11-4&oh=01_Q5Aa5QFEmyZ0Z9XKLIh18XPcHPXy-F10gy6DGSu65W3Mn98YJg&oe=6A864C7C&_nc_sid=5e03e0&_nc_cat=109",
+   "estado": "con foto"
+  },
+  {
+   "id": "02cf923a-3ba2-4185-badd-952e301ee15c",
+   "nombre": "Maria Cristina Kuhnle",
+   "celular": "01151560011",
+   "fotos": 0,
+   "numero": "5491151560011",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/56414233_325249298382096_3236523544212930560_n.jpg?ccb=11-4&oh=01_Q5Aa5QFKmnDQ-iK0X-1IIgFUhzGScHRvsJcWJ0-9xWebSE5dvQ&oe=6A8679EF&_nc_sid=5e03e0&_nc_cat=106",
+   "estado": "con foto"
+  },
+  {
+   "id": "52dfaf7b-71d2-4941-b006-69928669d1fa",
+   "nombre": "Agustin Pombo",
+   "celular": "+5491138548986",
+   "fotos": 1,
+   "numero": "5491138548986",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/681547545_1485488593227297_6189812618924963935_n.jpg?ccb=11-4&oh=01_Q5Aa5QEwyKYb0z5H4H7mkVsqBNHvcqYiiZ9vmoRxwgb8brk2pQ&oe=6A864E72&_nc_sid=5e03e0&_nc_cat=101",
+   "estado": "con foto"
+  },
+  {
+   "id": "b24be73a-0b44-402e-a33e-a16902320153",
+   "nombre": "Andre Croci",
+   "celular": "+5492257521264",
+   "fotos": 1,
+   "numero": "5492257521264",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/490567290_639159492254442_1676078946543559078_n.jpg?ccb=11-4&oh=01_Q5Aa5QHBRGPTgR_mPigmg1qy79XeyOosw3jQ-5zplnoSKAxP7Q&oe=6A866E87&_nc_sid=5e03e0&_nc_cat=100",
+   "estado": "con foto"
+  },
+  {
+   "id": "e570ae0b-d35b-4a1b-930e-841bfe02c441",
+   "nombre": "Ariel Cachazo",
+   "celular": "+5492944505703",
+   "fotos": 1,
+   "numero": "5492944505703",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/620568865_1446361680285919_1601759390993418336_n.jpg?ccb=11-4&oh=01_Q5Aa5QGoVAiQBqZrEtwt2YxdciUPfWljid6XDYXIeKvCYUWwkA&oe=6A8663EF&_nc_sid=5e03e0&_nc_cat=107",
+   "estado": "con foto"
+  },
+  {
+   "id": "a269b7ed-e545-4791-9a2f-fa5b8de41481",
+   "nombre": "Ariel Osvaldo Baudry",
+   "celular": "+5491139009550",
+   "fotos": 1,
+   "numero": "5491139009550",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/56122094_290667008519608_6536668988737323008_n.jpg?ccb=11-4&oh=01_Q5Aa5QHYwgNDgb7k60TKPMdyR-PScT_fcVOx0M-ZZUS-aMSOHQ&oe=6A864CA2&_nc_sid=5e03e0&_nc_cat=108",
+   "estado": "con foto"
+  },
+  {
+   "id": "49770d9f-2f0d-473f-94bc-e92a6651b207",
+   "nombre": "Carmelo Andres Caliendo",
+   "celular": "2246485878",
+   "fotos": 1,
+   "numero": "5492246485878",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/642760002_1692904922124363_3898694077656092461_n.jpg?ccb=11-4&oh=01_Q5Aa5QGTv7sVjvKoOl1Ut5FMjFTsNnm7dbPxqOfjuuaD0NH6CA&oe=6A864CB8&_nc_sid=5e03e0&_nc_cat=104",
+   "estado": "con foto"
+  },
+  {
+   "id": "69010d6b-32d0-4bb1-bf62-37d6b80d2847",
+   "nombre": "Florencia Ailem Baudry",
+   "celular": "+542257614955",
+   "fotos": 2,
+   "numero": "5492257614955",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/567187029_25374309898872466_3143551321581895120_n.jpg?ccb=11-4&oh=01_Q5Aa5QH7W0KifS3exb8gx9d9SXWKdp21q4KR5CitTJM6dR6vMg&oe=6A865CE0&_nc_sid=5e03e0&_nc_cat=108",
+   "estado": "con foto"
+  },
+  {
+   "id": "a53dde8d-8117-4594-98a3-35cf018ba4e2",
+   "nombre": "Maia Baudry",
+   "celular": "+5492257618621",
+   "fotos": 1,
+   "numero": "5492257618621",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/677007459_1585344536336597_957566281421550991_n.jpg?ccb=11-4&oh=01_Q5Aa5QF136cEUirfy74kwH_5WHW0QHqgpGzBikceghtnyBRCew&oe=6A866BF9&_nc_sid=5e03e0&_nc_cat=103",
+   "estado": "con foto"
+  },
+  {
+   "id": "ce7b9315-6610-49a7-a7c1-5245995cb9fe",
+   "nombre": "Maria Cecilia Vidal",
+   "celular": "+5491165517385",
+   "fotos": 1,
+   "numero": "5491165517385",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/457655899_608059854892273_3446800119792802646_n.jpg?ccb=11-4&oh=01_Q5Aa5QGefM5fDxQASdbrK_GIsvABo_d03YvbpPEeFpwIeE9QEQ&oe=6A866078&_nc_sid=5e03e0&_nc_cat=106",
+   "estado": "con foto"
+  },
+  {
+   "id": "dc356d70-1de1-46a0-bdd2-5ef410b894c4",
+   "nombre": "Ricardo Pombo",
+   "celular": "+5491152473335",
+   "fotos": 1,
+   "numero": "5491152473335",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/56679711_307234889972930_8194839201821229056_n.jpg?ccb=11-4&oh=01_Q5Aa5QHD3FhgeAPsQJXOt_m_FEwr8FjV9OXUZAvn9Kab7Df3Fg&oe=6A8654DD&_nc_sid=5e03e0&_nc_cat=110",
+   "estado": "con foto"
+  },
+  {
+   "id": "849ddeb1-3e13-4324-9530-5f796373977b",
+   "nombre": "Santiago Caliendo",
+   "celular": "+5492257540586",
+   "fotos": 1,
+   "numero": "5492257540586",
+   "url": "https://pps.whatsapp.net/v/t61.24694-24/642821282_2158155348278758_601289173422698712_n.jpg?ccb=11-4&oh=01_Q5Aa5QGwV58Djjzxxy2L7fZLqHFdI4BbFo8FJiZmAEVXIBuGAg&oe=6A8653EA&_nc_sid=5e03e0&_nc_cat=108",
+   "estado": "con foto"
+  },
+  {
+   "id": "60206d1a-5b65-4ea1-b222-ee13a15bc299",
+   "nombre": "Alejandra Vidal",
+   "celular": "+5492944699675",
+   "fotos": 0,
+   "numero": "5492944699675",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "67e1e436-2761-41a6-912b-d8b5f84be7fa",
+   "nombre": "Celso Graziani",
+   "celular": "2257612300",
+   "fotos": 0,
+   "numero": null,
+   "url": null,
+   "estado": "no tiene WhatsApp"
+  },
+  {
+   "id": "1050fc50-62ec-4f27-8119-1fbc7e6a9ae3",
+   "nombre": "Diana Karme",
+   "celular": "+5491173629225",
+   "fotos": 0,
+   "numero": "5491173629225",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "b93b940e-b387-4255-b843-e476188e73fc",
+   "nombre": "Fiorella Caliendo",
+   "celular": "2257619896",
+   "fotos": 0,
+   "numero": "5492257619896",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "7bde3e94-40e0-4aeb-a4b2-6329d59e46ca",
+   "nombre": "Graciela Kuhnle",
+   "celular": "+541151085004",
+   "fotos": 0,
+   "numero": "5491151085004",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "24d1f0eb-a418-488b-a423-ec97530122bd",
+   "nombre": "Juan Sebastian Baudry",
+   "celular": "+5492257603837",
+   "fotos": 0,
+   "numero": null,
+   "url": null,
+   "estado": "no tiene WhatsApp"
+  },
+  {
+   "id": "22603b67-117e-4fe4-84fe-efd8d123968f",
+   "nombre": "Karina Baudry",
+   "celular": "1158712290",
+   "fotos": 0,
+   "numero": "5491158712290",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "cee90dee-efcb-47e3-b8b4-2e35baab4cb9",
+   "nombre": "Leonardo Ezequiel Baudry",
+   "celular": "+5491169370722",
+   "fotos": 0,
+   "numero": "5491169370722",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "0e9f8d72-2be4-4c6b-87f6-d7a3c9a5ef6c",
+   "nombre": "Mauro Andres Caliendo",
+   "celular": "2246441072",
+   "fotos": 0,
+   "numero": "5492246441072",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "d5dd2524-c2d7-442f-8e4e-21ceff3d9a64",
+   "nombre": "Nadim Nadim",
+   "celular": "+17866588031",
+   "fotos": 0,
+   "numero": "17866588031",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "014cb164-317c-4550-bfe0-2130c19fac34",
+   "nombre": "Nina Baudry",
+   "celular": "+5493546545099",
+   "fotos": 0,
+   "numero": "5493546545099",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "13578242-b33b-474c-9bf9-b9cef6b512fd",
+   "nombre": "Walter Baudry",
+   "celular": "+13059568617",
+   "fotos": 0,
+   "numero": "13059568617",
+   "url": null,
+   "estado": "sin foto de perfil"
+  },
+  {
+   "id": "609c666e-ae10-4b05-b457-5e20f4c3ad29",
+   "nombre": "Yanel Baudry",
+   "celular": "+17866097984",
+   "fotos": 0,
+   "numero": "17866097984",
+   "url": null,
+   "estado": "sin foto de perfil"
+  }
+ ]
+}
