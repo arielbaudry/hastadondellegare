@@ -228,6 +228,14 @@ hay nada que filtrar.
 cambiar de foco no puede rearmar el diagrama ni mover la cámara, sólo cambia a
 quién se resalta. Por eso `diagramar()` ni siquiera recibe el foco.
 
+### En el celular
+
+Una sola barra arriba —marca, buscador y menú—; las pestañas y el alta viven en
+el desplegable. La ficha no es una sección debajo del árbol sino **una hoja que
+sube desde abajo**, con manija y cierre, y arranca cerrada: lo primero que se ve
+es el árbol. En escritorio nada de esto cambia (el envoltorio del menú es
+`display: contents`).
+
 ### Cámara e interacción
 
 - **Un clic** en una caja abre esa ficha en el panel y **encuadra su entorno**:
