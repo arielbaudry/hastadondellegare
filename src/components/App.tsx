@@ -67,7 +67,13 @@ export default function App() {
   const [focoId, setFocoId] = useState<string | null>(null);
   /** Personas por las que se pasó, para poder volver sobre los pasos. */
   const [historial, setHistorial] = useState<string[]>([]);
+  /**
+   * En el celular la ficha es una hoja que tapa el árbol, así que arranca
+   * cerrada: primero se ve el árbol, y la ficha sube al tocar a alguien.
+   */
   const [panelAbierto, setPanelAbierto] = useState(true);
+  /** Menú del celular: en pantalla chica no entran las pestañas ni el alta. */
+  const [menuAbierto, setMenuAbierto] = useState(false);
   const [edicion, setEdicion] = useState<Edicion>(null);
   const [guardando, setGuardando] = useState(false);
   const [errorForm, setErrorForm] = useState<string | null>(null);
@@ -75,6 +81,7 @@ export default function App() {
 
   // Tema guardado, antes de que se vea nada.
   useEffect(() => {
+    if (window.innerWidth <= 900) setPanelAbierto(false);
     // Claro por defecto: el árbol se lee mejor y es lo que espera la familia.
     // Quien prefiera oscuro lo elige en Ajustes y queda guardado.
     const t = window.localStorage.getItem("hdll:tema") ?? "claro";
@@ -333,7 +340,25 @@ export default function App() {
 
         {personas.length > 0 && <BuscadorPersonas personas={personas} onElegir={(id) => irA(id)} />}
 
-        <nav className="pestanas" role="tablist" aria-label="Secciones">
+        <button
+          className="boton-menu"
+          onClick={() => setMenuAbierto((v) => !v)}
+          aria-expanded={menuAbierto}
+          aria-label="Menú"
+        >
+          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+            <path
+              d={menuAbierto ? "M5 5l10 10M15 5L5 15" : "M3 6h14M3 10h14M3 14h14"}
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              fill="none"
+            />
+          </svg>
+        </button>
+
+        <div className={`acciones${menuAbierto ? " abierto" : ""}`}>
+          <nav className="pestanas" role="tablist" aria-label="Secciones">
           {(
             [
               ["arbol", "Árbol"],
@@ -342,18 +367,33 @@ export default function App() {
               ["ajustes", "Ajustes"],
             ] as [Vista, string][]
           ).map(([v, etiqueta]) => (
-            <button key={v} role="tab" aria-selected={vista === v} onClick={() => setVista(v)}>
+            <button
+              key={v}
+              role="tab"
+              aria-selected={vista === v}
+              onClick={() => {
+                setVista(v);
+                setMenuAbierto(false);
+              }}
+            >
               {etiqueta}
               {v === "revision" && pendientes > 0 && (
                 <span className="globo" title={`${pendientes} cosas para revisar`}>{pendientes}</span>
               )}
             </button>
           ))}
-        </nav>
+          </nav>
 
-        <button className="btn primario" onClick={() => setEdicion({ modo: "crear" })}>
-          <span aria-hidden="true">+</span> Agregar persona
-        </button>
+          <button
+            className="btn primario"
+            onClick={() => {
+              setEdicion({ modo: "crear" });
+              setMenuAbierto(false);
+            }}
+          >
+            <span aria-hidden="true">+</span> Agregar persona
+          </button>
+        </div>
       </header>
 
       {almacenamiento?.advertencia && (
@@ -430,11 +470,9 @@ export default function App() {
                 ))}
               </div>
 
-              {!panelAbierto && (
-                <button className="btn chico" onClick={() => setPanelAbierto(true)}>
-                  Ver ficha
-                </button>
-              )}
+              <button className="btn chico" onClick={() => setPanelAbierto((v) => !v)}>
+                {panelAbierto ? "Ocultar ficha" : "Ver ficha"}
+              </button>
               <button
                 className="btn chico"
                 onClick={() => setEdicion({ modo: "editar", persona: foco })}
