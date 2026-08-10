@@ -24,6 +24,13 @@ abuelos, tíos, primos y sobrinos se *derivan* en `src/lib/tree.ts`.
 Así es imposible que quede una relación a medias del tipo «A dice ser hijo de B
 pero B no lista a A». No agregar campos de relación redundantes.
 
+## La bitácora viaja con el árbol
+
+`arbol.bitacora` guarda los últimos 300 movimientos —quién entró, quién cargó o
+corrigió a quién— dentro del mismo documento. Va con el árbol a donde sea que
+esté guardado, y se poda sola. Las entradas se anotan **una por sesión**, no por
+latido: si no, sería una línea cada veinte segundos por persona.
+
 ## Coherencia en cada escritura
 
 `src/lib/validar.ts` corre siempre y deja el árbol sano:
