@@ -10,9 +10,13 @@ y todavía no tienen padres cargados— como lista de lo que falta averiguar.
 ## Cómo se carga
 
 1. **Empezá por vos.** Después, desde tu ficha, «+ Padre / madre».
-2. Cada persona nueva se crea **desde la ficha de otra**, con los botones de
-   *Sumar familia*. Así el vínculo queda hecho de los dos lados sin que haya que
-   acordarse de nada.
+2. Cada persona nueva se crea **desde el modal de edición de otra**, con los
+   botones de *Sumar familia*. Así el vínculo queda hecho de los dos lados sin
+   que haya que acordarse de nada. Esos botones guardan primero lo que estés
+   editando y recién después abren la ficha nueva.
+
+   La ficha del costado es sólo para mirar: datos, contacto y linaje. Para
+   operar sobre una persona se entra a *Editar*.
 3. Si no sabés el nombre de los padres pero querés cargar un hermano, se puede
    igual: la app crea una ficha «Padre o madre» sin nombre para poder vincularlos,
    y avisa que lo hace.
