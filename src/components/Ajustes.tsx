@@ -3,10 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import { nombreCompleto } from "@/lib/tree";
 import { leerClaveAdmin } from "@/lib/cliente";
-import type { EstadoAlmacenamiento, Permisos, Sesion } from "@/lib/cliente";
+import type { EstadoAlmacenamiento, Movimiento, Permisos, Sesion } from "@/lib/cliente";
 import type { Persona } from "@/lib/types";
 
 type Tema = "sistema" | "claro" | "oscuro";
+
+const ETIQUETA_ACCION: Record<string, string> = {
+  entro: "entró",
+  alta: "cargó a",
+  edicion: "corrigió a",
+  baja: "eliminó a",
+  deshacer: "deshizo el último cambio",
+  importar: "reemplazó el árbol",
+};
 
 function aplicarTema(t: Tema) {
   const raiz = document.documentElement;
@@ -47,6 +56,7 @@ export default function Ajustes({
   esEjemplo,
   almacenamiento,
   permisos,
+  bitacora,
   sesion,
   onSalir,
   onProbarClave,
@@ -60,6 +70,7 @@ export default function Ajustes({
   esEjemplo: boolean;
   almacenamiento: EstadoAlmacenamiento | null;
   permisos: Permisos;
+  bitacora: Movimiento[];
   sesion: Sesion | null;
   onSalir: () => void;
   onProbarClave: (clave: string) => Promise<boolean>;
@@ -132,6 +143,44 @@ export default function Ajustes({
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="seccion-form">
+          <h3>Quién hizo qué</h3>
+          <p>
+            Últimos movimientos del árbol: quién entró y quién cargó o corrigió a quién. Se
+            guardan los 300 más recientes, junto con el árbol.
+          </p>
+          {bitacora.length === 0 ? (
+            <p style={{ fontSize: 13, color: "var(--tinta-tenue)" }}>Todavía no hay movimientos.</p>
+          ) : (
+            <>
+              <div className="chips" style={{ marginBottom: 12 }}>
+                {[...new Map(bitacora.map((m) => [m.quien, m])).keys()].slice(0, 12).map((quien) => (
+                  <span className="pastilla" key={quien}>
+                    {quien} · {bitacora.filter((m) => m.quien === quien).length}
+                  </span>
+                ))}
+              </div>
+              <ul className="bitacora">
+                {bitacora.slice(0, 40).map((m, i) => (
+                  <li key={`${m.cuando}-${i}`}>
+                    <span className="cuando">
+                      {new Date(m.cuando).toLocaleString("es-AR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                    <strong>{m.quien}</strong>
+                    <span className={`accion ${m.accion}`}>{ETIQUETA_ACCION[m.accion] ?? m.accion}</span>
+                    {m.detalle && <span className="detalle">{m.detalle}</span>}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
 
         <div className="seccion-form">

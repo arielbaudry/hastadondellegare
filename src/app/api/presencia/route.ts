@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { leerArbol } from "@/lib/store";
-import { irse, latir } from "@/lib/presencia";
+import { anotar, leerArbol, mutarArbol } from "@/lib/store";
+import { irse, latir, yaEstaba } from "@/lib/presencia";
 import { bloquearSiNoPuedeVer } from "@/lib/permisos";
 
 export const dynamic = "force-dynamic";
@@ -23,8 +23,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  const nuevo = !yaEstaba(String(id ?? ""));
   const conectados = latir(String(id ?? ""), String(nombre ?? ""));
-  const arbol = await leerArbol();
+  let arbol = await leerArbol();
+
+  // Se anota una entrada por sesión, no por latido: si no, la bitácora sería
+  // una línea cada veinte segundos por persona y no serviría para nada.
+  if (nuevo && nombre) {
+    arbol = await mutarArbol((a) => anotar(a, { quien: String(nombre), accion: "entro" }));
+  }
   return NextResponse.json(
     { conectados, rev: arbol.rev },
     { headers: { "Cache-Control": "no-store" } },

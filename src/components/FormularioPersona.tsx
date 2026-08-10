@@ -283,6 +283,37 @@ export default function FormularioPersona({
           </div>
 
           <div className="seccion-form">
+            <h3>Laterales · hermanos</h3>
+            <p>
+              Los hermanos salen de compartir padre o madre, así que no se cargan de a uno:
+              se elige a un hermano ya cargado y esta ficha pasa a tener sus mismos padres.
+              Si ese hermano tampoco los tiene, se crea la ficha que hace falta.
+            </p>
+            <div className="campos">
+              <div className="campo ancho">
+                <label htmlFor="f-hermano">Es hermano/a de</label>
+                <select
+                  id="f-hermano"
+                  value={d.hermanoDe ?? ""}
+                  onChange={(e) => campo("hermanoDe", e.target.value || undefined)}
+                >
+                  <option value="">— no cambiar —</option>
+                  {candidatos.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {etiqueta(p)}
+                    </option>
+                  ))}
+                </select>
+                {d.hermanoDe && (
+                  <span className="ayuda">
+                    Al guardar, esta ficha va a quedar con los mismos padres que esa persona.
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="seccion-form">
             <h3>Laterales · pareja</h3>
             <p>El vínculo se guarda en los dos sentidos automáticamente.</p>
             {parejas.map((v, i) => (

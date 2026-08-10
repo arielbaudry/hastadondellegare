@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { mutarArbol, registrar } from "@/lib/store";
+import { anotar, mutarArbol, registrar } from "@/lib/store";
 import { eliminarPersona, ErrorDeDatos, normalizar, sanearPersona } from "@/lib/validar";
 import { bloquearSiNoEsAdmin, bloquearSiNoPuedeEditar } from "@/lib/permisos";
 import type { Persona } from "@/lib/types";
@@ -81,8 +81,16 @@ export async function DELETE(req: Request, { params }: Ctx) {
   let borrada = false;
 
   const arbol = await mutarArbol((a) => {
+    const quien = a.personas.find((p) => p.id === id);
     borrada = eliminarPersona(a, id);
-    if (borrada) normalizar(a);
+    if (borrada) {
+      anotar(a, {
+        quien: autor || "alguien",
+        accion: "baja",
+        detalle: quien ? `${quien.nombres} ${quien.apellidos}` : id,
+      });
+      normalizar(a);
+    }
   });
 
   if (!borrada) return NextResponse.json({ error: "No existe esa persona." }, { status: 404 });

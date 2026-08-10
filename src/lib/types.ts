@@ -67,6 +67,14 @@ export interface Persona {
   actualizadoEn: string;
 }
 
+/** Una línea de la bitácora: quién hizo qué y cuándo. */
+export interface Movimiento {
+  cuando: string;
+  quien: string;
+  accion: "entro" | "alta" | "edicion" | "baja" | "deshacer" | "importar";
+  detalle?: string;
+}
+
 export interface Arbol {
   /** Se incrementa en cada escritura. Sirve para detectar ediciones pisadas. */
   rev: number;
@@ -74,6 +82,12 @@ export interface Arbol {
   esEjemplo: boolean;
   actualizadoEn: string;
   personas: Persona[];
+  /**
+   * Últimos movimientos, para que se pueda ver quién entró y quién cambió qué.
+   * Va dentro del documento del árbol —y no en un archivo aparte— porque viaja
+   * con él a donde sea que esté guardado, y se poda para que no crezca sin fin.
+   */
+  bitacora?: Movimiento[];
 }
 
 export const ARBOL_VACIO: Arbol = {
@@ -81,6 +95,7 @@ export const ARBOL_VACIO: Arbol = {
   esEjemplo: false,
   actualizadoEn: new Date(0).toISOString(),
   personas: [],
+  bitacora: [],
 };
 
 /**
@@ -93,4 +108,12 @@ export const ARBOL_VACIO: Arbol = {
 export type PersonaEntrada = Omit<
   Persona,
   "id" | "creadoEn" | "actualizadoEn" | "creadoPor" | "actualizadoPor"
-> & { id?: string; actualizadoEn?: string };
+> & {
+  id?: string;
+  actualizadoEn?: string;
+  /**
+   * No se guarda: es una instrucción del formulario. Al guardar, esta ficha
+   * adopta los padres de esa persona, que es lo que los vuelve hermanos.
+   */
+  hermanoDe?: string;
+};

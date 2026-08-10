@@ -27,6 +27,12 @@ function limpiar(): void {
   for (const [id, v] of visitantes) if (v.visto < corte) visitantes.delete(id);
 }
 
+/** ¿Ya venía latiendo? Sirve para anotar la entrada una sola vez. */
+export function yaEstaba(id: string): boolean {
+  limpiar();
+  return visitantes.has(id);
+}
+
 /** Registra el latido de alguien y devuelve la lista de presentes. */
 export function latir(id: string, nombre: string): string[] {
   limpiar();

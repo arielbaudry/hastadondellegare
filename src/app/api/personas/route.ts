@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { mutarArbol, registrar } from "@/lib/store";
+import { anotar, mutarArbol, registrar } from "@/lib/store";
 import { ErrorDeDatos, normalizar, sanearPersona } from "@/lib/validar";
 import { nombreCompleto } from "@/lib/tree";
 import { bloquearSiNoPuedeEditar } from "@/lib/permisos";
@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     const arbol = await mutarArbol((a) => {
       creada = sanearPersona(cuerpo.persona, null, cuerpo.autor);
       a.personas.push(creada);
+      anotar(a, { quien: cuerpo.autor || "alguien", accion: "alta", detalle: nombreCompleto(creada) });
       // Cargar a alguien deja de ser "el ejemplo" apenas hay data propia.
       if (!creada.creadoPor || creada.creadoPor !== "ejemplo") a.esEjemplo = false;
       normalizar(a);

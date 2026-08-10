@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { ARBOL_VACIO, type Arbol, type Persona } from "./types";
+import { ARBOL_VACIO, type Arbol, type Movimiento, type Persona } from "./types";
 import {
   ConflictoDeVersion,
   escribirArchivo,
@@ -165,7 +165,17 @@ let cola: Promise<unknown> = Promise.resolve();
  * Corre en cada lectura y es idempotente: sin esto, un árbol cargado con una
  * versión anterior aparecería sin las fotos hasta volver a guardar cada ficha.
  */
+const MAX_BITACORA = 300;
+
+/** Suma un movimiento a la bitácora del árbol, podando lo más viejo. */
+export function anotar(arbol: Arbol, m: Omit<Movimiento, "cuando">): void {
+  if (!Array.isArray(arbol.bitacora)) arbol.bitacora = [];
+  arbol.bitacora.unshift({ cuando: new Date().toISOString(), ...m });
+  arbol.bitacora = arbol.bitacora.slice(0, MAX_BITACORA);
+}
+
 function migrar(arbol: Arbol): void {
+  if (!Array.isArray(arbol.bitacora)) arbol.bitacora = [];
   for (const p of arbol.personas as (Persona & { fotoUrl?: string })[]) {
     if (!Array.isArray(p.fotos)) p.fotos = p.fotoUrl ? [p.fotoUrl] : [];
     delete p.fotoUrl;

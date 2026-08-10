@@ -5,7 +5,7 @@ import Acceso from "@/components/Acceso";
 import Ajustes from "@/components/Ajustes";
 import ArbolVista from "@/components/ArbolVista";
 import Aviso from "@/components/Aviso";
-import Bienvenida from "@/components/Bienvenida";
+import Bienvenida, { type AltaPropia } from "@/components/Bienvenida";
 import BuscadorPersonas from "@/components/BuscadorPersonas";
 import FichaPersona, { type TipoVinculo } from "@/components/FichaPersona";
 import FormularioPersona from "@/components/FormularioPersona";
@@ -29,6 +29,7 @@ import {
   leerClaveAdmin,
   type EstadoAlmacenamiento,
   type Permisos,
+  type Movimiento,
   type Sesion,
 } from "@/lib/cliente";
 import {
@@ -64,6 +65,7 @@ export default function App() {
   const [sesion, setSesion] = useState<Sesion | null>(null);
   const [contacto, setContacto] = useState({ email: "ariel@baudry.com.ar", telefono: "" });
   const [espejo, setEspejo] = useState<{ principal: string } | null>(null);
+  const [bitacora, setBitacora] = useState<Movimiento[]>([]);
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
@@ -121,6 +123,7 @@ export default function App() {
         setSesion(datos.sesion ?? null);
         if (datos.contacto) setContacto(datos.contacto);
         setEspejo(datos.espejo ?? null);
+        setBitacora(datos.bitacora ?? []);
 
         const guardado = leerFocoGuardado();
         const valido = guardado && datos.personas.some((p) => p.id === guardado);
@@ -153,6 +156,7 @@ export default function App() {
               .then((d) => {
                 setPersonas(d.personas);
                 setEsEjemplo(d.esEjemplo);
+                setBitacora(d.bitacora ?? []);
               })
               .catch(() => {});
           }
@@ -235,11 +239,38 @@ export default function App() {
     }
   }
 
-  async function guardar(datos: PersonaEntrada) {
+  async function guardar(entrada: PersonaEntrada) {
     setGuardando(true);
     setErrorForm(null);
     setVersionAlDia(undefined);
     try {
+      // "Es hermano/a de X" es una instrucción, no un campo: se traduce a
+      // compartir los padres de X, creando la ficha que falte si X tampoco los
+      // tiene cargados.
+      const { hermanoDe, ...datos } = entrada;
+      if (hermanoDe) {
+        const hermano = personas.find((p) => p.id === hermanoDe);
+        if (hermano) {
+          let padres = [...hermano.padres];
+          if (!padres.length) {
+            const m = await crearPersona(
+              {
+                nombres: "Padre o madre",
+                apellidos: hermano.apellidos,
+                vivo: false,
+                fotos: [],
+                padres: [],
+                parejas: [],
+                notas: `Ficha creada para vincular como hermanos a ${nombreCompleto(hermano)} y ${datos.nombres} ${datos.apellidos}. Completá el nombre cuando lo sepan.`,
+              },
+              autor,
+            );
+            await editarPersona(hermano.id, { padres: [m.persona.id] }, autor);
+            padres = [m.persona.id];
+          }
+          datos.padres = padres;
+        }
+      }
       if (edicion?.modo === "editar") {
         const res = await editarPersona(edicion.persona.id, datos, autor);
         aplicar(res.personas);
@@ -302,6 +333,107 @@ export default function App() {
     } finally {
       setGuardando(false);
     }
+  }
+
+  /**
+   * Alta de quien entra y todavía no está en el árbol. Los vínculos de dos
+   * saltos —nieto, sobrino— necesitan una persona en el medio; se crea como
+   * ficha sin nombre, igual que al sumar un hermano sin padres cargados, y
+   * queda como una punta abierta más para completar.
+   */
+  async function crearMiFicha({ nombres, apellidos, enganche }: AltaPropia) {
+    const base = personas.find((p) => p.id === enganche.personaId);
+    if (!base) throw new Error("No encontré a esa persona.");
+
+    const marcador = async (apellido: string, padres: string[], nota: string) =>
+      (
+        await crearPersona(
+          { nombres: "Padre o madre", apellidos: apellido, vivo: false, fotos: [], padres, parejas: [], notas: nota },
+          nombres,
+        )
+      ).persona;
+
+    let padres: string[] = [];
+    let parejas: { personaId: string; tipo: "pareja" }[] = [];
+    let engancharDespues: string | null = null;
+
+    switch (enganche.tipo) {
+      case "hijo": {
+        const pareja = parejasDe(base.id, indexar(personas));
+        padres = [base.id, ...(pareja.length === 1 ? [pareja[0].id] : [])];
+        break;
+      }
+      case "padre":
+        engancharDespues = base.id;
+        break;
+      case "pareja":
+        parejas = [{ personaId: base.id, tipo: "pareja" }];
+        break;
+      case "hermano": {
+        if (base.padres.length) padres = [...base.padres];
+        else {
+          const m = await marcador(
+            base.apellidos,
+            [],
+            `Ficha creada para vincular como hermanos a ${nombreCompleto(base)} y ${nombres} ${apellidos}.`,
+          );
+          await editarPersona(base.id, { padres: [m.id] }, nombres);
+          padres = [m.id];
+        }
+        break;
+      }
+      case "nieto": {
+        const m = await marcador(
+          base.apellidos,
+          [base.id],
+          `Ficha creada para vincular a ${nombres} ${apellidos} como nieto/a de ${nombreCompleto(base)}. Falta el nombre.`,
+        );
+        padres = [m.id];
+        break;
+      }
+      case "sobrino": {
+        let padresDelTio = base.padres;
+        if (!padresDelTio.length) {
+          const abuelo = await marcador(
+            base.apellidos,
+            [],
+            `Ficha creada para vincular a ${nombres} ${apellidos} como sobrino/a de ${nombreCompleto(base)}. Falta el nombre.`,
+          );
+          await editarPersona(base.id, { padres: [abuelo.id] }, nombres);
+          padresDelTio = [abuelo.id];
+        }
+        const m = await marcador(
+          base.apellidos,
+          padresDelTio,
+          `Hermano/a de ${nombreCompleto(base)}, creado para vincular a ${nombres} ${apellidos}. Falta el nombre.`,
+        );
+        padres = [m.id];
+        break;
+      }
+    }
+
+    const res = await crearPersona(
+      { nombres, apellidos, vivo: true, fotos: [], padres, parejas },
+      nombres,
+    );
+
+    let lista = res.personas;
+    if (engancharDespues) {
+      const b = lista.find((p) => p.id === engancharDespues);
+      lista = (
+        await editarPersona(
+          engancharDespues,
+          { padres: [...new Set([...(b?.padres ?? []), res.persona.id])].slice(0, 2) },
+          nombres,
+        )
+      ).personas;
+    }
+
+    setPersonas(lista);
+    setAutor(nombres);
+    guardarAutor(nombres);
+    setFocoId(res.persona.id);
+    guardarFoco(res.persona.id);
   }
 
   async function borrar(p: Persona) {
@@ -385,10 +517,17 @@ export default function App() {
     return (
       <Bienvenida
         personas={personas}
-        onListo={(n) => {
+        onListo={(n, id) => {
           setAutor(n);
           guardarAutor(n);
+          // El árbol abre en la ficha de quien entra: lo primero que uno quiere
+          // ver es dónde está parado en su propia familia.
+          if (id) {
+            setFocoId(id);
+            guardarFoco(id);
+          }
         }}
+        onAlta={crearMiFicha}
       />
     );
   }
@@ -665,6 +804,7 @@ export default function App() {
           esEjemplo={esEjemplo}
           almacenamiento={almacenamiento}
           permisos={permisos}
+          bitacora={bitacora}
           sesion={sesion}
           onSalir={async () => {
             await cerrarSesion();

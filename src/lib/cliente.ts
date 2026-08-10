@@ -1,6 +1,8 @@
 "use client";
 
-import type { Arbol, Persona, PersonaEntrada } from "./types";
+import type { Arbol, Movimiento, Persona, PersonaEntrada } from "./types";
+
+export type { Movimiento };
 
 /** Estado del almacenamiento que informa /api/arbol. */
 export interface EstadoAlmacenamiento {
