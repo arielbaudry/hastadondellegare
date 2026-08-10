@@ -29,6 +29,35 @@ un «Baudry Juan Martin». Un correo o un teléfono idénticos valen 1.00 direct
 Aun así hay falsos positivos a la vista: «Gabriel Baudry» matchea con «Gabriela
 Baudry», y «Maia Baudry» con «Maria Clara Baudry». Se ven y se descartan.
 
+## Fotos de perfil de WhatsApp — `/fotos`
+
+De las personas con celular cargado, **16 tienen foto de perfil visible y 13 de ellas no tenían
+ninguna foto en el árbol**. La página las muestra en una grilla, con la foto a la vista, y se
+tildan las que se quieran traer.
+
+De dónde salen: la línea **+54 9 11 5523-8822** (el chatbot de MCV, en la VM de Oracle) está
+conectada a WhatsApp con Baileys. Se le agregó el endpoint `/foto-perfil`, de **sólo lectura**:
+pregunta si un número tiene WhatsApp y devuelve la URL de su avatar — lo mismo que ve cualquiera
+que lo tenga agendado. No manda mensajes ni abre conversaciones. Ver el skill `servidor_oracle`.
+
+Las credenciales del panel del bot **no salen de la VM**: el `curl` se arma allá contra su propio
+localhost y por acá vuelve sólo el JSON.
+
+### El número hay que armarlo bien
+
+Las fichas tienen el teléfono escrito de seis maneras: `2246485878`, `01151560011`,
+`+5492257619896`. Se prueban las variantes (`549…`, `54…`) y gana la que exista.
+
+**El número crudo no se prueba nunca**, aunque sea lo primero que uno haría: WhatsApp lo lee como
+internacional y `2246485878` le resulta un número válido de otro país. Contestaba «existe, y con
+foto» — la de un desconocido, que habría terminado en la ficha de un familiar. La primera corrida
+trajo cuatro casos así.
+
+Quien no aparece con foto casi siempre es por privacidad: WhatsApp muestra el avatar sólo a los
+contactos, y la línea del bot no tiene agendada a la familia.
+
+La foto se **suma** a la ficha, nunca pisa las que ya estaban: es la regla del árbol.
+
 ## Arrancar y parar
 
 ```bash
@@ -48,6 +77,7 @@ entera.
 |---|---|
 | `storage/cotejo.json` | El cruce calculado. Tarda ~25 s, por eso queda en caché; «Recalcular» lo rehace |
 | `storage/decisiones.json` | Qué contactos confirmaste y qué valor elegiste para cada campo. Se guarda a cada clic |
+| `storage/whatsapp.json` | El resultado de la última búsqueda de avatares. Las URLs de WhatsApp vencen en unas horas: si las fotos dejan de verse, «Buscar en WhatsApp» de nuevo |
 
 ## Variables
 
