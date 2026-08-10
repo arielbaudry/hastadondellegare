@@ -17,12 +17,22 @@ export async function PATCH(req: Request, { params }: Ctx) {
   try {
     const cuerpo = await req.json();
     let noExiste = false;
+    let pisada: Persona | null = null;
     let actualizada: Persona | null = null;
 
     const arbol = await mutarArbol((a) => {
       const i = a.personas.findIndex((p) => p.id === id);
       if (i === -1) {
         noExiste = true;
+        return;
+      }
+
+      // Concurrencia: el cliente manda la versión que tenía a la vista. Si en el
+      // medio otro guardó esa misma ficha, no se pisa — se avisa y decide quien
+      // está editando. Es raro que pase, pero perder lo que cargó otro no.
+      const visto = cuerpo.persona?.actualizadoEn;
+      if (visto && visto !== a.personas[i].actualizadoEn) {
+        pisada = a.personas[i];
         return;
       }
       // Se parte de la persona guardada: lo que el cliente no manda, se conserva.
@@ -37,6 +47,18 @@ export async function PATCH(req: Request, { params }: Ctx) {
     });
 
     if (noExiste) return NextResponse.json({ error: "No existe esa persona." }, { status: 404 });
+
+    if (pisada) {
+      const otro = pisada as Persona;
+      return NextResponse.json(
+        {
+          error: `${otro.actualizadoPor ?? "Otra persona"} editó esta ficha mientras la tenías abierta.`,
+          conflicto: true,
+          persona: otro,
+        },
+        { status: 409 },
+      );
+    }
 
     await registrar({ accion: "edicion", id, quien: cuerpo.autor });
     return NextResponse.json({ persona: actualizada, rev: arbol.rev, personas: arbol.personas });

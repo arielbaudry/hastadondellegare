@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CampoFecha from "@/components/CampoFecha";
 import FotosInput from "@/components/FotosInput";
 import { nombreCompleto, ordenarPorNacimiento, anio } from "@/lib/tree";
@@ -20,6 +20,11 @@ interface Props {
   onCancelar: () => void;
   /** Aclaración que depende de cómo se llegó al formulario. */
   nota?: string;
+  /**
+   * Versión al día de la ficha, cuando el guardado chocó con el de otro. Se
+   * adopta sin tocar lo escrito, así el segundo intento sí entra.
+   */
+  versionAlDia?: string;
 }
 
 function vacia(inicial?: Partial<PersonaEntrada>): PersonaEntrada {
@@ -30,6 +35,7 @@ function vacia(inicial?: Partial<PersonaEntrada>): PersonaEntrada {
     fotos: [],
     padres: [],
     parejas: [],
+    actualizadoEn: "",
     ...inicial,
   } as PersonaEntrada;
 }
@@ -44,6 +50,7 @@ export default function FormularioPersona({
   onGuardar,
   onCancelar,
   nota,
+  versionAlDia,
 }: Props) {
   // Los arrays de vínculos se copian aparte: con un spread superficial serían
   // el mismo array que el de la persona guardada, y cualquier retoque acá
@@ -58,6 +65,10 @@ export default function FormularioPersona({
         } as PersonaEntrada)
       : vacia(inicial),
   );
+
+  useEffect(() => {
+    if (versionAlDia) setD((a) => ({ ...a, actualizadoEn: versionAlDia }));
+  }, [versionAlDia]);
 
   function campo<K extends keyof PersonaEntrada>(k: K, v: PersonaEntrada[K]) {
     setD((actual) => ({ ...actual, [k]: v }));

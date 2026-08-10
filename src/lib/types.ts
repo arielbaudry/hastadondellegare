@@ -83,8 +83,14 @@ export const ARBOL_VACIO: Arbol = {
   personas: [],
 };
 
-/** Campos que el cliente puede mandar al crear o editar. `id` y sellos, no. */
+/**
+ * Campos que el cliente puede mandar al crear o editar.
+ *
+ * `actualizadoEn` viaja a propósito: es la versión que la persona tenía a la
+ * vista, y el servidor la usa para detectar que otro guardó esa misma ficha
+ * mientras tanto.
+ */
 export type PersonaEntrada = Omit<
   Persona,
   "id" | "creadoEn" | "actualizadoEn" | "creadoPor" | "actualizadoPor"
-> & { id?: string };
+> & { id?: string; actualizadoEn?: string };

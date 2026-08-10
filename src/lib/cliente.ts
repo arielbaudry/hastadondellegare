@@ -118,12 +118,32 @@ export function crearPersona(persona: PersonaEntrada, autor: string) {
   });
 }
 
-export function editarPersona(id: string, persona: Partial<PersonaEntrada>, autor: string) {
-  return pedir<{ persona: Persona; personas: Persona[] }>(`/api/personas/${id}`, {
+export class ConflictoDeEdicion extends Error {
+  constructor(mensaje: string, readonly persona: Persona) {
+    super(mensaje);
+  }
+}
+
+export async function editarPersona(
+  id: string,
+  persona: Partial<PersonaEntrada>,
+  autor: string,
+) {
+  const res = await fetch(`/api/personas/${id}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      ...(leerClaveAdmin() ? { "x-clave-admin": leerClaveAdmin() } : {}),
+    },
     body: JSON.stringify({ persona, autor }),
   });
+  const datos = await res.json().catch(() => ({}));
+  if (res.status === 409 && datos.conflicto) {
+    throw new ConflictoDeEdicion(datos.error, datos.persona as Persona);
+  }
+  if (!res.ok) throw new Error(datos.error ?? `Error ${res.status}`);
+  return datos as { persona: Persona; personas: Persona[] };
 }
 
 export function borrarPersona(id: string, autor: string) {
@@ -146,6 +166,27 @@ export function deshacerCambio(autor: string) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ autor }),
+  });
+}
+
+/** Identidad de este navegador, sólo para contar quién está mirando. */
+const CLAVE_VISITA = "hdll:visita";
+
+export function idDeVisita(): string {
+  if (typeof window === "undefined") return "";
+  let id = window.localStorage.getItem(CLAVE_VISITA);
+  if (!id) {
+    id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    window.localStorage.setItem(CLAVE_VISITA, id);
+  }
+  return id;
+}
+
+export function latir(nombre: string) {
+  return pedir<{ conectados: string[]; rev: number }>("/api/presencia", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: idDeVisita(), nombre }),
   });
 }
 

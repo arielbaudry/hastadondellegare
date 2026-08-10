@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Acceso from "@/components/Acceso";
 import Ajustes from "@/components/Ajustes";
 import ArbolVista from "@/components/ArbolVista";
 import Aviso from "@/components/Aviso";
+import Bienvenida from "@/components/Bienvenida";
 import BuscadorPersonas from "@/components/BuscadorPersonas";
 import FichaPersona, { type TipoVinculo } from "@/components/FichaPersona";
 import FormularioPersona from "@/components/FormularioPersona";
@@ -22,6 +23,8 @@ import {
   sembrar,
   traerArbol,
   cerrarSesion,
+  ConflictoDeEdicion,
+  latir,
   guardarClaveAdmin,
   leerClaveAdmin,
   type EstadoAlmacenamiento,
@@ -77,7 +80,11 @@ export default function App() {
   const [edicion, setEdicion] = useState<Edicion>(null);
   const [guardando, setGuardando] = useState(false);
   const [errorForm, setErrorForm] = useState<string | null>(null);
+  const [versionAlDia, setVersionAlDia] = useState<string | undefined>();
   const [autor, setAutor] = useState("");
+  const [conectados, setConectados] = useState<string[]>([]);
+  const [rev, setRev] = useState<number | null>(null);
+  const [verConectados, setVerConectados] = useState(false);
 
   // Tema guardado, antes de que se vea nada.
   useEffect(() => {
@@ -88,6 +95,11 @@ export default function App() {
     if (t === "claro" || t === "oscuro") document.documentElement.setAttribute("data-tema", t);
     setAutor(leerAutor());
   }, []);
+
+  const edicionRef = useRef<Edicion>(null);
+  useEffect(() => {
+    edicionRef.current = edicion;
+  }, [edicion]);
 
   const aplicar = useCallback((lista: Persona[]) => {
     setPersonas(lista);
@@ -104,6 +116,7 @@ export default function App() {
         setEsEjemplo(datos.esEjemplo);
         setAlmacenamiento(datos.almacenamiento);
         setPermisos(datos.permisos);
+        setRev(datos.rev ?? null);
         setSesion(datos.sesion ?? null);
         if (datos.contacto) setContacto(datos.contacto);
 
@@ -116,6 +129,45 @@ export default function App() {
       .catch((e) => setErrorCarga(e instanceof Error ? e.message : "No se pudo cargar el árbol."))
       .finally(() => setCargando(false));
   }, []);
+
+  /**
+   * Late cada tanto para que el resto sepa que estamos, y de paso se entera de
+   * si alguien guardó algo: si el `rev` del servidor cambió, se recarga el
+   * árbol. Nunca mientras haya un formulario abierto, para no pisar lo que se
+   * está escribiendo.
+   */
+  useEffect(() => {
+    if (!autor || !permisos.puedeVer) return;
+    let vivo = true;
+
+    const tic = async () => {
+      try {
+        const r = await latir(autor);
+        if (!vivo) return;
+        setConectados(r.conectados);
+        setRev((actual) => {
+          if (actual !== null && r.rev !== actual && !edicionRef.current) {
+            traerArbol()
+              .then((d) => {
+                setPersonas(d.personas);
+                setEsEjemplo(d.esEjemplo);
+              })
+              .catch(() => {});
+          }
+          return r.rev;
+        });
+      } catch {
+        /* si falla un latido no pasa nada: se reintenta al siguiente */
+      }
+    };
+
+    void tic();
+    const id = window.setInterval(tic, 25_000);
+    return () => {
+      vivo = false;
+      window.clearInterval(id);
+    };
+  }, [autor, permisos.puedeVer]);
 
   const foco = useMemo(() => personas.find((p) => p.id === focoId) ?? null, [personas, focoId]);
 
@@ -184,6 +236,7 @@ export default function App() {
   async function guardar(datos: PersonaEntrada) {
     setGuardando(true);
     setErrorForm(null);
+    setVersionAlDia(undefined);
     try {
       if (edicion?.modo === "editar") {
         const res = await editarPersona(edicion.persona.id, datos, autor);
@@ -232,7 +285,18 @@ export default function App() {
       setEsEjemplo(false);
       setEdicion(null);
     } catch (e) {
-      setErrorForm(e instanceof Error ? e.message : "No se pudo guardar.");
+      if (e instanceof ConflictoDeEdicion) {
+        // Se recarga el árbol para que se vea lo que puso el otro, se adopta la
+        // versión nueva —para que el segundo intento sí entre— y se avisa sin
+        // cerrar el formulario: lo escrito no se pierde.
+        traerArbol().then((d) => setPersonas(d.personas)).catch(() => {});
+        setVersionAlDia(e.persona.actualizadoEn);
+        setErrorForm(
+          `${e.message} Fijate cómo quedó en el árbol; si tu versión sigue siendo la correcta, guardá de nuevo y esta vez entra.`,
+        );
+      } else {
+        setErrorForm(e instanceof Error ? e.message : "No se pudo guardar.");
+      }
     } finally {
       setGuardando(false);
     }
@@ -314,12 +378,40 @@ export default function App() {
     );
   }
 
+  // El nombre se pide una sola vez, antes de dejar tocar nada.
+  if (!cargando && !errorCarga && permisos.puedeVer && !autor) {
+    return (
+      <Bienvenida
+        personas={personas}
+        onListo={(n) => {
+          setAutor(n);
+          guardarAutor(n);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="app">
       <Aviso restringido={permisos.restringido} />
 
       <header className="cabecera">
-        <div className="marca">
+        <button
+          className="marca"
+          title="Volver al inicio"
+          onClick={() => {
+            setVista("arbol");
+            setMenuAbierto(false);
+            setEdicion(null);
+            setPanelAbierto(window.innerWidth > 900);
+            setHistorial([]);
+            const raiz = ordenarPorNacimiento(personas).at(0);
+            if (raiz) {
+              setFocoId(raiz.id);
+              guardarFoco(raiz.id);
+            }
+          }}
+        >
           <span className="logo" aria-hidden="true">
             <svg viewBox="0 0 32 32" width="26" height="26">
               <g stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none">
@@ -336,9 +428,37 @@ export default function App() {
             <h1>Hasta dónde llegaré</h1>
             <span className="sub">el árbol de la familia, cargado entre todos</span>
           </span>
-        </div>
+        </button>
 
         {personas.length > 0 && <BuscadorPersonas personas={personas} onElegir={(id) => irA(id)} />}
+
+        {conectados.length > 0 && (
+          <div className="presencia">
+            <button
+              className="globo-presencia"
+              onClick={() => setVerConectados((v) => !v)}
+              aria-expanded={verConectados}
+              title={`${conectados.length} mirando el árbol`}
+            >
+              <span className="punto" aria-hidden="true" />
+              {conectados.length}
+            </button>
+            {verConectados && (
+              <div className="lista-presencia">
+                <strong>Mirando el árbol ahora</strong>
+                <ul>
+                  {conectados.map((n) => (
+                    <li key={n}>
+                      <span className="punto" aria-hidden="true" />
+                      {n}
+                      {n === autor && " (vos)"}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
 
         <button
           className="boton-menu"
@@ -563,12 +683,14 @@ export default function App() {
               ? `Ser hermanos quiere decir compartir padre o madre. Como todavía no hay ninguno cargado para ${nombreCompleto(edicion.vinculo.base)}, se va a crear una ficha «Padre o madre ${edicion.vinculo.base.apellidos}» para vincularlos; después se completa con el nombre cuando lo sepan.`
               : undefined
           }
+          versionAlDia={versionAlDia}
           guardando={guardando}
           error={errorForm}
           onGuardar={(datos) => void guardar(datos)}
           onCancelar={() => {
             setEdicion(null);
             setErrorForm(null);
+            setVersionAlDia(undefined);
           }}
         />
       )}
